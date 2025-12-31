@@ -116,7 +116,7 @@ The system uses a file-based integration approach rather than real-time synchron
 1. Users compose in their DAW with the VST plugin analyzing chords
 2. VST exports progressions as JSON files
 3. Users manually upload JSON files to the web platform
-4. Backend parses JSON and stores data in MySQL database
+4. Backend parses JSON and stores data in MSSQL database
 5. Users can download progressions back as MIDI through a custom JSON -> MIDI Parser
 
 ---
