@@ -1,6 +1,7 @@
 # Chordal Web Platform
 
 ![Chordal Text](screenshots/simpleLogo.png)
+
 ![Chordal Text](https://img.shields.io/badge/Chordal-Music%20Theory%20Education-blue)
 ![ASP.NET](https://img.shields.io/badge/ASP.NET-Web%20Forms-purple)
 ![MSSQL](https://img.shields.io/badge/MySQL-Database-orange)
@@ -10,6 +11,8 @@
 > **Note:** This repository is archived as a reference for a final year project completed in 2025. It is not actively maintained and contributions are not accepted.
 
 ##  About
+
+<img src="screenshots/landingpage.png" alt="chordalland" width="400" height="400"/>
 
 Chordal is a two-component system designed to bridge the gap between Digital Audio Workstation (DAW) composition and music theory education:
 
@@ -304,6 +307,12 @@ etc...
 This project is provided as-is for reference purposes only. This is a final year academic project and is **not licensed for commercial use or redistribution**.
 
 If you wish to use any part of this code for your own projects, please contact the author. 
+
+---
+
+## Author(s)
+
+**M. A. Aiman (aka tempOcha) and M. L. Joaqhim**
 
 ---
 
