@@ -12,7 +12,7 @@
 
 ##  About
 
-<img src="screenshots/landingpage.png" alt="chordalland" width="400" height="400"/>
+<img src="screenshots/landingpage.png" alt="chordalland" width="1000" height="1000"/>
 
 Chordal is a two-component system designed to bridge the gap between Digital Audio Workstation (DAW) composition and music theory education:
 
@@ -34,7 +34,7 @@ This project was developed as a final year project to demonstrate the integratio
 
 ### User Management
 
-<img src="screenshots/login.gif" alt="chordallogin" width="300" height="300"/>
+<img src="screenshots/login.gif" alt="chordallogin" width="500" height="500"/>
 
 - User registration and authentication with secure password hashing (PBKDF2)
 - Profile management and customization
@@ -44,7 +44,7 @@ This project was developed as a final year project to demonstrate the integratio
 ### Progression Management
 
 
-<img src="screenshots/progression.gif" alt="chordalprog" width="300" height="300"/>
+<img src="screenshots/progression.gif" alt="chordalprog" width="500" height="500"/>
 
 - Upload chord progressions (JSON format from VST plugin)
 - View and edit progression metadata (title, key, tempo, category)
@@ -53,7 +53,7 @@ This project was developed as a final year project to demonstrate the integratio
 
 ### Learning Center
 
-<img src="screenshots/learn.gif" alt="chordallearn" width="300" height="300"/>
+<img src="screenshots/learn.gif" alt="chordallearn" width="500" height="500"/>
 
 - Interactive music theory lessons
 - Progression of lessons from basic triads to advanced concepts
@@ -62,7 +62,7 @@ This project was developed as a final year project to demonstrate the integratio
 
 ### Community Features
 
-<img src="screenshots/commu.gif" alt="chordalcomm" width="300" height="300"/>
+<img src="screenshots/commu.gif" alt="chordalcomm" width="500" height="500"/>
 
 - Browse public chord progressions
 - Like and comment on progressions
@@ -73,7 +73,7 @@ This project was developed as a final year project to demonstrate the integratio
 
 ### Admin Panel
 
-<img src="screenshots/admin.gif" alt="chordalcomm" width="300" height="300"/>
+<img src="screenshots/admin.gif" alt="chordalcomm" width="500" height="500"/>
 
 - User management (enable/disable accounts)
 - Content moderation (review reported content)
