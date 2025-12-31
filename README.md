@@ -4,7 +4,7 @@
 
 ![Chordal Text](https://img.shields.io/badge/Chordal-Music%20Theory%20Education-blue)
 ![ASP.NET](https://img.shields.io/badge/ASP.NET-Web%20Forms-purple)
-![MSSQL](https://img.shields.io/badge/MySQL-Database-orange)
+![MSSQL](https://img.shields.io/badge/MSSQL-Database-orange)
 
 **Chordal Web Platform** is an educational web application designed to help musicians learn music theory through chord progression analysis. This platform integrates with the [Chordal VST Plugin](https://github.com/tempOcha/Chordal-Plugin-Public-Ver) to provide a comprehensive music theory learning experience.
 
