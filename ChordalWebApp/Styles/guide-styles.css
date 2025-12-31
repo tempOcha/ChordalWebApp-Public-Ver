@@ -1,0 +1,228 @@
+﻿/* ==========================================
+   GUIDELINES PAGE - MINIMALIST DESIGN
+   With Particle Background Animation
+   ========================================== */
+
+/* Guidelines Header with Particle Canvas */
+.guidelines-header-section {
+    position: relative;
+    background: linear-gradient(135deg, var(--color-teal) 0%, var(--color-teal-medium) 100%);
+    padding: var(--spacing-2xl) 0;
+    margin-bottom: var(--spacing-2xl);
+    overflow: hidden;
+    min-height: 300px;
+}
+
+#guidelines-particles-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.3;
+    z-index: 1;
+}
+
+.guidelines-header-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-md);
+}
+
+.guidelines-badge {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.2);
+    color: var(--color-white);
+    padding: var(--spacing-xs) var(--spacing-md);
+    border-radius: 50px;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: var(--spacing-md);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.guidelines-header-title {
+    font-family: var(--font-heading);
+    font-size: var(--text-5xl);
+    font-weight: 700;
+    color: var(--color-white);
+    margin-bottom: var(--spacing-md);
+    line-height: 1.2;
+}
+
+.guidelines-header-subtitle {
+    font-size: var(--text-lg);
+    color: rgba(255, 255, 255, 0.95);
+    line-height: 1.7;
+    font-weight: 400;
+}
+
+/* Main Content Container */
+.guidelines-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-md) var(--spacing-2xl);
+}
+
+/* Guideline Section Cards */
+.guideline-section {
+    background: var(--color-white);
+    border: var(--border-width) solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    margin-bottom: var(--spacing-lg);
+    transition: all var(--transition-base);
+    border-left: 4px solid var(--color-teal);
+}
+
+    .guideline-section:hover {
+        border-color: var(--color-teal);
+        box-shadow: var(--shadow-sm);
+        transform: translateY(-2px);
+    }
+
+.guideline-section-number {
+    display: inline-block;
+    width: 36px;
+    height: 36px;
+    background: var(--color-soft-green);
+    color: var(--color-teal);
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: var(--text-base);
+    line-height: 36px;
+    text-align: center;
+    margin-bottom: var(--spacing-md);
+    border: 2px solid var(--color-teal);
+}
+
+.guideline-section h2 {
+    font-family: var(--font-heading);
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin-bottom: var(--spacing-md);
+    line-height: 1.3;
+}
+
+.guideline-section p {
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+    margin-bottom: 0;
+    font-size: var(--text-base);
+}
+
+/* Empty State */
+.guidelines-empty-state {
+    text-align: center;
+    padding: var(--spacing-2xl);
+    background: var(--color-white);
+    border: var(--border-width) solid var(--border-color);
+    border-radius: var(--radius-lg);
+}
+
+.guidelines-empty-icon {
+    font-size: 4rem;
+    margin-bottom: var(--spacing-md);
+    opacity: 0.3;
+}
+
+.guidelines-empty-state h3 {
+    font-family: var(--font-heading);
+    font-size: var(--text-2xl);
+    color: var(--color-text-primary);
+    margin-bottom: var(--spacing-sm);
+}
+
+.guidelines-empty-state p {
+    color: var(--color-text-muted);
+    font-size: var(--text-base);
+    margin-bottom: 0;
+}
+
+/* Last Updated Section */
+.guidelines-footer {
+    text-align: center;
+    margin-top: var(--spacing-2xl);
+    padding-top: var(--spacing-lg);
+    border-top: var(--border-width) solid var(--border-color);
+}
+
+.last-updated {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    margin-bottom: var(--spacing-lg);
+}
+
+/* Admin Edit Button */
+.admin-edit-section {
+    text-align: center;
+    margin-top: var(--spacing-md);
+}
+
+.admin-edit-btn {
+    display: inline-block;
+    padding: var(--spacing-md) var(--spacing-xl);
+    background: var(--color-white);
+    color: var(--color-accent-pink);
+    border: var(--border-width-thick) solid var(--color-accent-pink);
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: var(--text-base);
+    text-decoration: none;
+    transition: all var(--transition-base);
+}
+
+    .admin-edit-btn:hover {
+        background: var(--color-accent-pink);
+        color: var(--color-white);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-sm);
+    }
+
+.admin-edit-icon {
+    margin-right: var(--spacing-xs);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .guidelines-header-section {
+        min-height: 250px;
+    }
+
+    .guidelines-header-title {
+        font-size: var(--text-3xl);
+    }
+
+    .guidelines-header-subtitle {
+        font-size: var(--text-base);
+    }
+
+    .guideline-section {
+        padding: var(--spacing-lg);
+    }
+
+        .guideline-section h2 {
+            font-size: var(--text-xl);
+        }
+}
+
+@media (max-width: 576px) {
+    .guidelines-header-section {
+        min-height: 200px;
+        padding: var(--spacing-lg) 0;
+    }
+
+    .guidelines-header-title {
+        font-size: var(--text-2xl);
+    }
+
+    .guideline-section {
+        padding: var(--spacing-md);
+    }
+}

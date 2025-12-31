@@ -1,0 +1,2042 @@
+// Chordal Databse Tables and Procedures //
+
+CREATE TABLE [dbo].[Users] (
+    [UserID]           INT            IDENTITY (1, 1) NOT NULL,
+    [Username]         NVARCHAR (100) NOT NULL,
+    [Email]            NVARCHAR (255) NOT NULL,
+    [PasswordHash]     NVARCHAR (MAX) NOT NULL,
+    [RegistrationDate] DATETIME       DEFAULT (getdate()) NULL,
+    [IsEnabled]        BIT            DEFAULT ((1)) NULL,
+    [LastModified]     DATETIME       NULL,
+    [LastLoginDate]    DATETIME       NULL,
+    [IsAdmin]          BIT            DEFAULT ((0)) NOT NULL,
+    [AdminNotes]       NVARCHAR (500) NULL,
+    PRIMARY KEY CLUSTERED ([UserID] ASC),
+    UNIQUE NONCLUSTERED ([Email] ASC),
+    UNIQUE NONCLUSTERED ([Username] ASC)
+);
+
+
+GO
+CREATE NONCLUSTERED INDEX [IX_Users_Email]
+    ON [dbo].[Users]([Email] ASC);
+
+
+GO
+CREATE NONCLUSTERED INDEX [IX_Users_IsAdmin]
+    ON [dbo].[Users]([IsAdmin] ASC);
+
+
+
+
+//-------------------
+
+CREATE TABLE [dbo].[UserPreferences] (
+    [UserID]                 INT      NOT NULL,
+    [EmailNotifications]     BIT      DEFAULT ((1)) NOT NULL,
+    [CommunityNotifications] BIT      DEFAULT ((1)) NOT NULL,
+    [CreatedDate]            DATETIME DEFAULT (getdate()) NOT NULL,
+    [LastModified]           DATETIME DEFAULT (getdate()) NOT NULL,
+    PRIMARY KEY CLUSTERED ([UserID] ASC),
+    CONSTRAINT [FK_UserPreferences_Users] FOREIGN KEY ([UserID]) REFERENCES [dbo].[Users] ([UserID]) ON DELETE CASCADE
+);
+
+
+//-----------------------
+
+CREATE TABLE [dbo].[UserNotifications] (
+    [NotificationID]   INT            IDENTITY (1, 1) NOT NULL,
+    [UserID]           INT            NOT NULL,
+    [NotificationType] NVARCHAR (50)  NOT NULL,
+    [Message]          NVARCHAR (500) NOT NULL,
+    [IsRead]           BIT            DEFAULT ((0)) NOT NULL,
+    [CreatedDate]      DATETIME       DEFAULT (getdate()) NOT NULL,
+    PRIMARY KEY CLUSTERED ([NotificationID] ASC),
+    CONSTRAINT [FK_UserNotifications_Users] FOREIGN KEY ([UserID]) REFERENCES [dbo].[Users] ([UserID]) ON DELETE CASCADE
+);
+
+
+GO
+CREATE NONCLUSTERED INDEX [IX_UserNotifications_UserID]
+    ON [dbo].[UserNotifications]([UserID] ASC);
+
+
+GO
+CREATE NONCLUSTERED INDEX [IX_UserNotifications_IsRead]
+    ON [dbo].[UserNotifications]([IsRead] ASC);
+
+
+GO
+CREATE NONCLUSTERED INDEX [IX_UserNotifications_CreatedDate]
+    ON [dbo].[UserNotifications]([CreatedDate] DESC);
+
+
+//--------------------
+
+
+CREATE TABLE [dbo].[Progressions] (
+    [ProgressionID]    INT            IDENTITY (1, 1) NOT NULL,
+    [UserID]           INT            NOT NULL,
+    [ProgressionTitle] NVARCHAR (255) NULL,
+    [KeyRoot]          INT            NOT NULL,
+    [IsKeyMajor]       BIT            NOT NULL,
+    [Tempo]            INT            NULL,
+    [Timestamp]        DATETIME       NULL,
+    [ChordalVersion]   NVARCHAR (50)  NULL,
+    [UploadDate]       DATETIME       DEFAULT (getdate()) NULL,
+    [CategoryID]       INT            NULL,
+    PRIMARY KEY CLUSTERED ([ProgressionID] ASC),
+    CONSTRAINT [FK_Progressions_Categories] FOREIGN KEY ([CategoryID]) REFERENCES [dbo].[ProgressionCategories] ([CategoryID]) ON DELETE SET NULL,
+    CONSTRAINT [FK_Progressions_Users] FOREIGN KEY ([UserID]) REFERENCES [dbo].[Users] ([UserID])
+);
+
+
+GO
+CREATE NONCLUSTERED INDEX [IX_Progressions_CategoryID]
+    ON [dbo].[Progressions]([CategoryID] ASC);
+
+
+GO
+CREATE NONCLUSTERED INDEX [IX_Progressions_Title]
+    ON [dbo].[Progressions]([ProgressionTitle] ASC);
+
+//----------------------
+
+CREATE TABLE [dbo].[ProgressionChordEvents] (
+    [ChordEventID]   INT            IDENTITY (1, 1) NOT NULL,
+    [ProgressionID]  INT            NOT NULL,
+    [StartTime]      FLOAT (53)     NOT NULL,
+    [Duration]       FLOAT (53)     NOT NULL,
+    [ChordName]      NVARCHAR (100) NOT NULL,
+    [NotesCSV]       NVARCHAR (MAX) NULL,
+    [RootNoteChroma] INT            NOT NULL,
+    [Quality]        NVARCHAR (50)  NOT NULL,
+    [Extensions]     NVARCHAR (100) NULL,
+    [RomanNumeral]   NVARCHAR (50)  NOT NULL,
+    [ChordFunction]  NVARCHAR (100) NOT NULL,
+    [SequenceOrder]  INT            NOT NULL,
+    PRIMARY KEY CLUSTERED ([ChordEventID] ASC),
+    CONSTRAINT [FK_ProgressionChordEvents_Progressions] FOREIGN KEY ([ProgressionID]) REFERENCES [dbo].[Progressions] ([ProgressionID]) ON DELETE CASCADE
+);
+
+//------------------------
+
+CREATE TABLE [dbo].[ProgressionCategories] (
+    [CategoryID]   INT            IDENTITY (1, 1) NOT NULL,
+    [UserID]       INT            NOT NULL,
+    [CategoryName] NVARCHAR (50)  NOT NULL,
+    [Description]  NVARCHAR (200) NULL,
+    [Color]        NVARCHAR (7)   DEFAULT ('#77aaff') NOT NULL,
+    [CreatedDate]  DATETIME       DEFAULT (getdate()) NOT NULL,
+    PRIMARY KEY CLUSTERED ([CategoryID] ASC),
+    CONSTRAINT [UQ_UserCategory] UNIQUE NONCLUSTERED ([UserID] ASC, [CategoryName] ASC),
+    CONSTRAINT [FK_ProgressionCategories_Users] FOREIGN KEY ([UserID]) REFERENCES [dbo].[Users] ([UserID]) ON DELETE CASCADE
+);
+
+
+//-------------------------
+
+CREATE TABLE [dbo].[PasswordResetTokens] (
+    [TokenID]        INT            IDENTITY (1, 1) NOT NULL,
+    [UserID]         INT            NOT NULL,
+    [Token]          NVARCHAR (128) NOT NULL,
+    [ExpirationTime] DATETIME       NOT NULL,
+    [IsUsed]         BIT            DEFAULT ((0)) NOT NULL,
+    [CreatedDate]    DATETIME       DEFAULT (getdate()) NOT NULL,
+    PRIMARY KEY CLUSTERED ([TokenID] ASC),
+    UNIQUE NONCLUSTERED ([Token] ASC),
+    CONSTRAINT [FK_PasswordResetTokens_Users] FOREIGN KEY ([UserID]) REFERENCES [dbo].[Users] ([UserID]) ON DELETE CASCADE
+);
+
+
+GO
+CREATE NONCLUSTERED INDEX [IX_PasswordResetTokens_Token]
+    ON [dbo].[PasswordResetTokens]([Token] ASC);
+
+
+GO
+CREATE NONCLUSTERED INDEX [IX_PasswordResetTokens_UserID]
+    ON [dbo].[PasswordResetTokens]([UserID] ASC);
+
+-- =============================================
+-- Chordal Learning Centre Database Schema
+-- =============================================
+
+-- Lesson Categories Table
+CREATE TABLE [dbo].[LessonCategories] (
+    [CategoryID]    INT            IDENTITY (1, 1) NOT NULL,
+    [CategoryName]  NVARCHAR (100) NOT NULL,
+    [Description]   NVARCHAR (500) NULL,
+    [DisplayOrder]  INT            NOT NULL,
+    [CreatedDate]   DATETIME       DEFAULT (getdate()) NOT NULL,
+    PRIMARY KEY CLUSTERED ([CategoryID] ASC),
+    UNIQUE NONCLUSTERED ([CategoryName] ASC)
+);
+
+-- Lessons Table (metadata only - content is in static files)
+CREATE TABLE [dbo].[Lessons] (
+    [LessonID]      INT            IDENTITY (1, 1) NOT NULL,
+    [CategoryID]    INT            NOT NULL,
+    [LessonSlug]    NVARCHAR (100) NOT NULL, -- URL-friendly identifier (e.g., 'basic-triads')
+    [LessonTitle]   NVARCHAR (200) NOT NULL,
+    [Description]   NVARCHAR (500) NULL,
+    [DifficultyLevel] NVARCHAR (20) NOT NULL, -- 'Beginner', 'Intermediate', 'Advanced'
+    [DisplayOrder]  INT            NOT NULL,
+    [EstimatedMinutes] INT         NULL, -- Estimated time to complete
+    [HasTutorial]   BIT            DEFAULT ((0)) NOT NULL, -- Whether lesson has interactive tutorial
+    [CreatedDate]   DATETIME       DEFAULT (getdate()) NOT NULL,
+    PRIMARY KEY CLUSTERED ([LessonID] ASC),
+    UNIQUE NONCLUSTERED ([LessonSlug] ASC),
+    CONSTRAINT [FK_Lessons_Categories] FOREIGN KEY ([CategoryID]) 
+        REFERENCES [dbo].[LessonCategories] ([CategoryID]) ON DELETE CASCADE
+);
+
+GO
+CREATE NONCLUSTERED INDEX [IX_Lessons_CategoryID]
+    ON [dbo].[Lessons]([CategoryID] ASC);
+
+GO
+CREATE NONCLUSTERED INDEX [IX_Lessons_DifficultyLevel]
+    ON [dbo].[Lessons]([DifficultyLevel] ASC);
+
+-- User Lesson Progress Table
+CREATE TABLE [dbo].[UserLessonProgress] (
+    [ProgressID]    INT      IDENTITY (1, 1) NOT NULL,
+    [UserID]        INT      NOT NULL,
+    [LessonID]      INT      NOT NULL,
+    [Status]        NVARCHAR (20) NOT NULL, -- 'InProgress', 'Completed'
+    [StartedDate]   DATETIME DEFAULT (getdate()) NOT NULL,
+    [CompletedDate] DATETIME NULL,
+    [LastAccessedDate] DATETIME DEFAULT (getdate()) NOT NULL,
+    PRIMARY KEY CLUSTERED ([ProgressID] ASC),
+    CONSTRAINT [UQ_UserLesson] UNIQUE NONCLUSTERED ([UserID] ASC, [LessonID] ASC),
+    CONSTRAINT [FK_UserLessonProgress_Users] FOREIGN KEY ([UserID]) 
+        REFERENCES [dbo].[Users] ([UserID]) ON DELETE CASCADE,
+    CONSTRAINT [FK_UserLessonProgress_Lessons] FOREIGN KEY ([LessonID]) 
+        REFERENCES [dbo].[Lessons] ([LessonID]) ON DELETE CASCADE
+);
+
+GO
+CREATE NONCLUSTERED INDEX [IX_UserLessonProgress_UserID]
+    ON [dbo].[UserLessonProgress]([UserID] ASC);
+
+GO
+CREATE NONCLUSTERED INDEX [IX_UserLessonProgress_LessonID]
+    ON [dbo].[UserLessonProgress]([LessonID] ASC);
+
+GO
+CREATE NONCLUSTERED INDEX [IX_UserLessonProgress_Status]
+    ON [dbo].[UserLessonProgress]([Status] ASC);
+
+-- Tutorial Exercises Table (metadata for interactive tutorials)
+CREATE TABLE [dbo].[TutorialExercises] (
+    [ExerciseID]    INT            IDENTITY (1, 1) NOT NULL,
+    [LessonID]      INT            NOT NULL,
+    [ExerciseType]  NVARCHAR (50)  NOT NULL, -- 'MCQ', 'PianoRoll', 'ListeningIdentification'
+    [ExerciseSlug]  NVARCHAR (100) NOT NULL,
+    [DisplayOrder]  INT            NOT NULL,
+    [Instructions]  NVARCHAR (500) NOT NULL,
+    [CreatedDate]   DATETIME       DEFAULT (getdate()) NOT NULL,
+    PRIMARY KEY CLUSTERED ([ExerciseID] ASC),
+    UNIQUE NONCLUSTERED ([ExerciseSlug] ASC),
+    CONSTRAINT [FK_TutorialExercises_Lessons] FOREIGN KEY ([LessonID]) 
+        REFERENCES [dbo].[Lessons] ([LessonID]) ON DELETE CASCADE
+);
+
+GO
+CREATE NONCLUSTERED INDEX [IX_TutorialExercises_LessonID]
+    ON [dbo].[TutorialExercises]([LessonID] ASC);
+
+-- User Tutorial Progress Table
+CREATE TABLE [dbo].[UserTutorialProgress] (
+    [TutorialProgressID] INT      IDENTITY (1, 1) NOT NULL,
+    [UserID]            INT      NOT NULL,
+    [ExerciseID]        INT      NOT NULL,
+    [AttemptCount]      INT      DEFAULT ((0)) NOT NULL,
+    [CorrectCount]      INT      DEFAULT ((0)) NOT NULL,
+    [LastAttemptDate]   DATETIME DEFAULT (getdate()) NOT NULL,
+    [BestScore]         FLOAT    NULL, -- Percentage (0-100)
+    [IsCompleted]       BIT      DEFAULT ((0)) NOT NULL,
+    PRIMARY KEY CLUSTERED ([TutorialProgressID] ASC),
+    CONSTRAINT [UQ_UserExercise] UNIQUE NONCLUSTERED ([UserID] ASC, [ExerciseID] ASC),
+    CONSTRAINT [FK_UserTutorialProgress_Users] FOREIGN KEY ([UserID]) 
+        REFERENCES [dbo].[Users] ([UserID]) ON DELETE CASCADE,
+    CONSTRAINT [FK_UserTutorialProgress_Exercises] FOREIGN KEY ([ExerciseID]) 
+        REFERENCES [dbo].[TutorialExercises] ([ExerciseID]) ON DELETE CASCADE
+);
+
+GO
+CREATE NONCLUSTERED INDEX [IX_UserTutorialProgress_UserID]
+    ON [dbo].[UserTutorialProgress]([UserID] ASC);
+
+GO
+CREATE NONCLUSTERED INDEX [IX_UserTutorialProgress_ExerciseID]
+    ON [dbo].[UserTutorialProgress]([ExerciseID] ASC);
+
+
+-- =============================================
+-- Community Management Database Tables and Stored Procedures
+-- For Chordal Web Application
+-- =============================================
+
+-- Table: SharedProgressions
+-- Stores information about progressions shared with the community
+CREATE TABLE [dbo].[SharedProgressions] (
+    [SharedProgressionID]   INT            IDENTITY (1, 1) NOT NULL,
+    [ProgressionID]         INT            NOT NULL,
+    [UserID]                INT            NOT NULL,
+    [ShareTitle]            NVARCHAR (255) NOT NULL,
+    [ShareDescription]      NVARCHAR (1000) NULL,
+    [Tags]                  NVARCHAR (500) NULL, -- Comma-separated tags
+    [Visibility]            NVARCHAR (20)  NOT NULL DEFAULT 'Public', -- 'Public', 'RegisteredOnly'
+    [AllowDownload]         BIT            NOT NULL DEFAULT 1,
+    [ViewCount]             INT            NOT NULL DEFAULT 0,
+    [LikeCount]             INT            NOT NULL DEFAULT 0,
+    [ShareDate]             DATETIME       DEFAULT (getdate()) NOT NULL,
+    [Status]                NVARCHAR (20)  NOT NULL DEFAULT 'Published', -- 'Published', 'UnderReview', 'Removed'
+    [ReviewNotes]           NVARCHAR (500) NULL,
+    PRIMARY KEY CLUSTERED ([SharedProgressionID] ASC),
+    CONSTRAINT [FK_SharedProgressions_Progressions] FOREIGN KEY ([ProgressionID]) REFERENCES [dbo].[Progressions] ([ProgressionID]) ON DELETE CASCADE,
+    CONSTRAINT [FK_SharedProgressions_Users] FOREIGN KEY ([UserID]) REFERENCES [dbo].[Users] ([UserID])
+);
+
+GO
+CREATE NONCLUSTERED INDEX [IX_SharedProgressions_Status]
+    ON [dbo].[SharedProgressions]([Status] ASC);
+
+GO
+CREATE NONCLUSTERED INDEX [IX_SharedProgressions_ShareDate]
+    ON [dbo].[SharedProgressions]([ShareDate] DESC);
+
+GO
+CREATE NONCLUSTERED INDEX [IX_SharedProgressions_UserID]
+    ON [dbo].[SharedProgressions]([UserID] ASC);
+
+-- Table: ProgressionComments
+-- Stores comments on shared progressions
+CREATE TABLE [dbo].[ProgressionComments] (
+    [CommentID]             INT            IDENTITY (1, 1) NOT NULL,
+    [SharedProgressionID]   INT            NOT NULL,
+    [UserID]                INT            NOT NULL,
+    [ParentCommentID]       INT            NULL, -- For threaded replies
+    [CommentText]           NVARCHAR (1000) NOT NULL,
+    [CreatedDate]           DATETIME       DEFAULT (getdate()) NOT NULL,
+    [IsEdited]              BIT            DEFAULT (0) NOT NULL,
+    [IsDeleted]             BIT            DEFAULT (0) NOT NULL,
+    PRIMARY KEY CLUSTERED ([CommentID] ASC),
+    CONSTRAINT [FK_ProgressionComments_SharedProgressions] FOREIGN KEY ([SharedProgressionID]) REFERENCES [dbo].[SharedProgressions] ([SharedProgressionID]) ON DELETE CASCADE,
+    CONSTRAINT [FK_ProgressionComments_Users] FOREIGN KEY ([UserID]) REFERENCES [dbo].[Users] ([UserID]),
+    CONSTRAINT [FK_ProgressionComments_ParentComment] FOREIGN KEY ([ParentCommentID]) REFERENCES [dbo].[ProgressionComments] ([CommentID])
+);
+
+GO
+CREATE NONCLUSTERED INDEX [IX_ProgressionComments_SharedProgressionID]
+    ON [dbo].[ProgressionComments]([SharedProgressionID] ASC);
+
+-- Table: ProgressionRatings
+-- Stores user ratings for shared progressions
+CREATE TABLE [dbo].[ProgressionRatings] (
+    [RatingID]              INT      IDENTITY (1, 1) NOT NULL,
+    [SharedProgressionID]   INT      NOT NULL,
+    [UserID]                INT      NOT NULL,
+    [Rating]                INT      NOT NULL, -- 1-5 stars
+    [CreatedDate]           DATETIME DEFAULT (getdate()) NOT NULL,
+    PRIMARY KEY CLUSTERED ([RatingID] ASC),
+    CONSTRAINT [FK_ProgressionRatings_SharedProgressions] FOREIGN KEY ([SharedProgressionID]) REFERENCES [dbo].[SharedProgressions] ([SharedProgressionID]) ON DELETE CASCADE,
+    CONSTRAINT [FK_ProgressionRatings_Users] FOREIGN KEY ([UserID]) REFERENCES [dbo].[Users] ([UserID]),
+    CONSTRAINT [UQ_UserProgression_Rating] UNIQUE NONCLUSTERED ([SharedProgressionID] ASC, [UserID] ASC),
+    CONSTRAINT [CK_Rating_Range] CHECK ([Rating] >= 1 AND [Rating] <= 5)
+);
+
+-- Table: ContentReports
+-- Stores user reports of inappropriate content
+CREATE TABLE [dbo].[ContentReports] (
+    [ReportID]            INT             IDENTITY (1, 1) NOT NULL,
+    [SharedProgressionID] INT             NULL,
+    [CommentID]           INT             NULL,
+    [ReporterUserID]      INT             NOT NULL,
+    [ViolationType]       NVARCHAR (100)  NOT NULL,
+    [ReportDetails]       NVARCHAR (1000) NOT NULL,
+    [ReportDate]          DATETIME        DEFAULT (getdate()) NOT NULL,
+    [Status]              NVARCHAR (20)   DEFAULT ('Pending') NOT NULL,
+    [AdminNotes]          NVARCHAR (500)  NULL,
+    [ResolvedDate]        DATETIME        NULL,
+    [ModeratedBy]         INT             NULL,
+    PRIMARY KEY CLUSTERED ([ReportID] ASC),
+    CONSTRAINT [FK_ContentReports_ModeratedBy] FOREIGN KEY ([ModeratedBy]) REFERENCES [dbo].[Users] ([UserID]),
+    CONSTRAINT [FK_ContentReports_SharedProgressions] FOREIGN KEY ([SharedProgressionID]) REFERENCES [dbo].[SharedProgressions] ([SharedProgressionID]) ON DELETE CASCADE,
+    CONSTRAINT [FK_ContentReports_Comments] FOREIGN KEY ([CommentID]) REFERENCES [dbo].[ProgressionComments] ([CommentID]),
+    CONSTRAINT [FK_ContentReports_Users] FOREIGN KEY ([ReporterUserID]) REFERENCES [dbo].[Users] ([UserID])
+);
+
+
+GO
+CREATE NONCLUSTERED INDEX [IX_ContentReports_Status]
+    ON [dbo].[ContentReports]([Status] ASC);
+
+
+
+GO
+CREATE NONCLUSTERED INDEX [IX_ContentReports_Status]
+    ON [dbo].[ContentReports]([Status] ASC);
+
+-- Table: ProgressionLikes
+-- Stores user likes for shared progressions
+CREATE TABLE [dbo].[ProgressionLikes] (
+    [LikeID]                INT      IDENTITY (1, 1) NOT NULL,
+    [SharedProgressionID]   INT      NOT NULL,
+    [UserID]                INT      NOT NULL,
+    [CreatedDate]           DATETIME DEFAULT (getdate()) NOT NULL,
+    PRIMARY KEY CLUSTERED ([LikeID] ASC),
+    CONSTRAINT [FK_ProgressionLikes_SharedProgressions] FOREIGN KEY ([SharedProgressionID]) REFERENCES [dbo].[SharedProgressions] ([SharedProgressionID]) ON DELETE CASCADE,
+    CONSTRAINT [FK_ProgressionLikes_Users] FOREIGN KEY ([UserID]) REFERENCES [dbo].[Users] ([UserID]),
+    CONSTRAINT [UQ_UserProgression_Like] UNIQUE NONCLUSTERED ([SharedProgressionID] ASC, [UserID] ASC)
+);
+
+GO
+CREATE NONCLUSTERED INDEX [IX_ProgressionLikes_SharedProgressionID]
+    ON [dbo].[ProgressionLikes]([SharedProgressionID] ASC);
+
+GO
+CREATE NONCLUSTERED INDEX [IX_ProgressionLikes_UserID]
+    ON [dbo].[ProgressionLikes]([UserID] ASC);
+
+
+-- =============================================
+-- 1) TWO-FACTOR AUTHENTICATION FOR ADMINS
+-- =============================================
+
+-- Table: AdminTwoFactorCodes
+-- Stores temporary 2FA codes for admin login
+CREATE TABLE [dbo].[AdminTwoFactorCodes] (
+    [CodeID]            INT            IDENTITY(1,1) NOT NULL,
+    [UserID]            INT            NOT NULL,
+    [Code]              NVARCHAR(6)    NOT NULL,  -- 6-digit code
+    [ExpirationTime]    DATETIME       NOT NULL,
+    [IsUsed]            BIT            NOT NULL DEFAULT 0,
+    [CreatedDate]       DATETIME       NOT NULL DEFAULT GETDATE(),
+    [IPAddress]         NVARCHAR(45)   NULL,      -- IPv4 or IPv6
+    PRIMARY KEY CLUSTERED ([CodeID] ASC),
+    CONSTRAINT [FK_AdminTwoFactorCodes_Users] FOREIGN KEY ([UserID]) REFERENCES [dbo].[Users] ([UserID]) ON DELETE CASCADE
+);
+GO
+
+CREATE NONCLUSTERED INDEX [IX_AdminTwoFactorCodes_UserID]
+    ON [dbo].[AdminTwoFactorCodes]([UserID] ASC);
+GO
+
+CREATE NONCLUSTERED INDEX [IX_AdminTwoFactorCodes_Code]
+    ON [dbo].[AdminTwoFactorCodes]([Code] ASC);
+GO
+
+-- =============================================
+-- 2) COMMUNITY GUIDELINES CMS
+-- =============================================
+
+-- Table: CommunityGuidelines
+-- Stores community guidelines sections that can be edited by admins
+CREATE TABLE [dbo].[CommunityGuidelines] (
+    [GuidelineID]       INT            IDENTITY(1,1) NOT NULL,
+    [SectionTitle]      NVARCHAR(200)  NOT NULL,
+    [SectionContent]    NVARCHAR(MAX)  NOT NULL,
+    [SectionOrder]      INT            NOT NULL DEFAULT 0,
+    [IsActive]          BIT            NOT NULL DEFAULT 1,
+    [LastModified]      DATETIME       NOT NULL DEFAULT GETDATE(),
+    [ModifiedByUserID]  INT            NULL,
+    [Version]           INT            NOT NULL DEFAULT 1,
+    PRIMARY KEY CLUSTERED ([GuidelineID] ASC),
+    CONSTRAINT [FK_CommunityGuidelines_Users] FOREIGN KEY ([ModifiedByUserID]) REFERENCES [dbo].[Users] ([UserID]) ON DELETE SET NULL
+);
+GO
+
+CREATE NONCLUSTERED INDEX [IX_CommunityGuidelines_SectionOrder]
+    ON [dbo].[CommunityGuidelines]([SectionOrder] ASC);
+GO
+
+-- Table: GuidelineHistory
+-- Tracks changes to guidelines for audit purposes
+CREATE TABLE [dbo].[GuidelineHistory] (
+    [HistoryID]         INT            IDENTITY(1,1) NOT NULL,
+    [GuidelineID]       INT            NOT NULL,
+    [SectionTitle]      NVARCHAR(200)  NOT NULL,
+    [SectionContent]    NVARCHAR(MAX)  NOT NULL,
+    [ModifiedByUserID]  INT            NULL,
+    [ModifiedDate]      DATETIME       NOT NULL DEFAULT GETDATE(),
+    [ChangeNote]        NVARCHAR(500)  NULL,
+    [Version]           INT            NOT NULL,
+    PRIMARY KEY CLUSTERED ([HistoryID] ASC),
+    CONSTRAINT [FK_GuidelineHistory_Guidelines] FOREIGN KEY ([GuidelineID]) REFERENCES [dbo].[CommunityGuidelines] ([GuidelineID]) ON DELETE CASCADE,
+    CONSTRAINT [FK_GuidelineHistory_Users] FOREIGN KEY ([ModifiedByUserID]) REFERENCES [dbo].[Users] ([UserID]) ON DELETE SET NULL
+);
+GO
+
+////////////////////////////////////////
+////////////////////////////////////////
+////////////////////////////////////////
+            Stored Procedures
+////////////////////////////////////////
+////////////////////////////////////////
+////////////////////////////////////////
+
+CREATE PROCEDURE sp_CleanupExpiredResetTokens
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    DELETE FROM PasswordResetTokens
+    WHERE ExpirationTime < GETDATE() OR IsUsed = 1;
+    
+    SELECT @@ROWCOUNT AS TokensDeleted;
+END
+
+//----------------------
+
+
+CREATE PROCEDURE sp_GetProgressionStatsByCategory
+    @UserID INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    SELECT 
+        pc.CategoryID,
+        pc.CategoryName,
+        pc.Color,
+        COUNT(p.ProgressionID) AS ProgressionCount,
+        MIN(p.UploadDate) AS FirstProgressionDate,
+        MAX(p.UploadDate) AS LastProgressionDate
+    FROM ProgressionCategories pc
+    LEFT JOIN Progressions p ON pc.CategoryID = p.CategoryID
+    WHERE pc.UserID = @UserID
+    GROUP BY pc.CategoryID, pc.CategoryName, pc.Color
+    ORDER BY pc.CategoryName;
+END
+
+//----------------------
+
+
+CREATE PROCEDURE sp_GetUnreadNotificationCount
+    @UserID INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    SELECT COUNT(*) AS UnreadCount
+    FROM UserNotifications
+    WHERE UserID = @UserID AND IsRead = 0;
+END
+
+//-----------------------
+
+
+CREATE PROCEDURE sp_SearchProgressions
+    @UserID INT,
+    @SearchTerm NVARCHAR(100) = NULL,
+    @CategoryID INT = NULL,
+    @KeyRoot INT = NULL,
+    @IsKeyMajor BIT = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    SELECT 
+        p.ProgressionID,
+        ISNULL(p.ProgressionTitle, 'Untitled Progression') AS ProgressionTitle,
+        p.KeyRoot,
+        p.IsKeyMajor,
+        p.UploadDate,
+        pc.CategoryName,
+        pc.Color AS CategoryColor,
+        (SELECT COUNT(*) FROM ProgressionChordEvents pce WHERE pce.ProgressionID = p.ProgressionID) AS ChordEventCount
+    FROM Progressions p
+    LEFT JOIN ProgressionCategories pc ON p.CategoryID = pc.CategoryID
+    WHERE p.UserID = @UserID
+        AND (@SearchTerm IS NULL OR 
+             p.ProgressionTitle LIKE '%' + @SearchTerm + '%' OR
+             EXISTS (
+                 SELECT 1 FROM ProgressionChordEvents pce
+                 WHERE pce.ProgressionID = p.ProgressionID
+                 AND (pce.ChordName LIKE '%' + @SearchTerm + '%' OR 
+                      pce.RomanNumeral LIKE '%' + @SearchTerm + '%')
+             ))
+        AND (@CategoryID IS NULL OR p.CategoryID = @CategoryID)
+        AND (@KeyRoot IS NULL OR p.KeyRoot = @KeyRoot)
+        AND (@IsKeyMajor IS NULL OR p.IsKeyMajor = @IsKeyMajor)
+    ORDER BY p.UploadDate DESC;
+END
+
+-- =============================================
+-- Stored Procedures
+-- =============================================
+
+-- Get User's Learning Progress Summary
+GO
+CREATE PROCEDURE sp_GetUserLearningProgress
+    @UserID INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    SELECT 
+        lc.CategoryID,
+        lc.CategoryName,
+        COUNT(DISTINCT l.LessonID) AS TotalLessons,
+        COUNT(DISTINCT ulp.LessonID) AS StartedLessons,
+        SUM(CASE WHEN ulp.Status = 'Completed' THEN 1 ELSE 0 END) AS CompletedLessons,
+        CAST(
+            CASE 
+                WHEN COUNT(DISTINCT l.LessonID) > 0 
+                THEN (CAST(SUM(CASE WHEN ulp.Status = 'Completed' THEN 1 ELSE 0 END) AS FLOAT) / COUNT(DISTINCT l.LessonID)) * 100
+                ELSE 0 
+            END AS DECIMAL(5,2)
+        ) AS CompletionPercentage
+    FROM LessonCategories lc
+    LEFT JOIN Lessons l ON lc.CategoryID = l.CategoryID
+    LEFT JOIN UserLessonProgress ulp ON l.LessonID = ulp.LessonID AND ulp.UserID = @UserID
+    GROUP BY lc.CategoryID, lc.CategoryName, lc.DisplayOrder
+    ORDER BY lc.DisplayOrder;
+END
+
+-- Mark Lesson as Started
+GO
+CREATE PROCEDURE sp_MarkLessonStarted
+    @UserID INT,
+    @LessonID INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    -- Insert or update progress record
+    IF EXISTS (SELECT 1 FROM UserLessonProgress WHERE UserID = @UserID AND LessonID = @LessonID)
+    BEGIN
+        UPDATE UserLessonProgress
+        SET LastAccessedDate = GETDATE()
+        WHERE UserID = @UserID AND LessonID = @LessonID;
+    END
+    ELSE
+    BEGIN
+        INSERT INTO UserLessonProgress (UserID, LessonID, Status, StartedDate, LastAccessedDate)
+        VALUES (@UserID, @LessonID, 'InProgress', GETDATE(), GETDATE());
+    END
+END
+
+-- Mark Lesson as Completed
+GO
+CREATE PROCEDURE sp_MarkLessonCompleted
+    @UserID INT,
+    @LessonID INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    -- Update to completed status
+    UPDATE UserLessonProgress
+    SET Status = 'Completed',
+        CompletedDate = GETDATE(),
+        LastAccessedDate = GETDATE()
+    WHERE UserID = @UserID AND LessonID = @LessonID;
+    
+    -- If no record exists, create one
+    IF @@ROWCOUNT = 0
+    BEGIN
+        INSERT INTO UserLessonProgress (UserID, LessonID, Status, StartedDate, CompletedDate, LastAccessedDate)
+        VALUES (@UserID, @LessonID, 'Completed', GETDATE(), GETDATE(), GETDATE());
+    END
+END
+
+-- Record Tutorial Exercise Attempt
+GO
+CREATE PROCEDURE sp_RecordTutorialAttempt
+    @UserID INT,
+    @ExerciseID INT,
+    @IsCorrect BIT,
+    @Score FLOAT = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    -- Insert or update progress record
+    IF EXISTS (SELECT 1 FROM UserTutorialProgress WHERE UserID = @UserID AND ExerciseID = @ExerciseID)
+    BEGIN
+        UPDATE UserTutorialProgress
+        SET AttemptCount = AttemptCount + 1,
+            CorrectCount = CorrectCount + CASE WHEN @IsCorrect = 1 THEN 1 ELSE 0 END,
+            LastAttemptDate = GETDATE(),
+            BestScore = CASE 
+                WHEN @Score IS NOT NULL AND (BestScore IS NULL OR @Score > BestScore) 
+                THEN @Score 
+                ELSE BestScore 
+            END,
+            IsCompleted = CASE WHEN @IsCorrect = 1 THEN 1 ELSE IsCompleted END
+        WHERE UserID = @UserID AND ExerciseID = @ExerciseID;
+    END
+    ELSE
+    BEGIN
+        INSERT INTO UserTutorialProgress (UserID, ExerciseID, AttemptCount, CorrectCount, LastAttemptDate, BestScore, IsCompleted)
+        VALUES (@UserID, @ExerciseID, 1, CASE WHEN @IsCorrect = 1 THEN 1 ELSE 0 END, GETDATE(), @Score, @IsCorrect);
+    END
+END
+
+-- Get Recommended Next Lessons
+GO
+CREATE PROCEDURE sp_GetRecommendedLessons
+    @UserID INT,
+    @MaxResults INT = 5
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    -- Get lessons user hasn't completed yet, prioritizing current difficulty level
+    SELECT TOP (@MaxResults)
+        l.LessonID,
+        l.LessonSlug,
+        l.LessonTitle,
+        l.Description,
+        l.DifficultyLevel,
+        l.EstimatedMinutes,
+        lc.CategoryName,
+        CASE WHEN ulp.ProgressID IS NOT NULL THEN 1 ELSE 0 END AS IsStarted,
+        ulp.Status
+    FROM Lessons l
+    INNER JOIN LessonCategories lc ON l.CategoryID = lc.CategoryID
+    LEFT JOIN UserLessonProgress ulp ON l.LessonID = ulp.LessonID AND ulp.UserID = @UserID
+    WHERE ulp.Status IS NULL OR ulp.Status != 'Completed'
+    ORDER BY 
+        l.DifficultyLevel,
+        CASE WHEN ulp.Status = 'InProgress' THEN 0 ELSE 1 END, -- Prioritize in-progress lessons
+        l.DisplayOrder;
+END
+
+-- Share a progression with the community
+GO
+CREATE PROCEDURE sp_ShareProgression
+    @ProgressionID INT,
+    @UserID INT,
+    @ShareTitle NVARCHAR(255),
+    @ShareDescription NVARCHAR(1000) = NULL,
+    @Tags NVARCHAR(500) = NULL,
+    @Visibility NVARCHAR(20) = 'Public',
+    @AllowDownload BIT = 1
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    -- Verify the progression belongs to the user
+    IF NOT EXISTS (SELECT 1 FROM Progressions WHERE ProgressionID = @ProgressionID AND UserID = @UserID)
+    BEGIN
+        RAISERROR('Progression not found or does not belong to user', 16, 1);
+        RETURN;
+    END
+    
+    -- Check if already shared
+    IF EXISTS (SELECT 1 FROM SharedProgressions WHERE ProgressionID = @ProgressionID AND UserID = @UserID)
+    BEGIN
+        -- Update existing share
+        UPDATE SharedProgressions
+        SET ShareTitle = @ShareTitle,
+            ShareDescription = @ShareDescription,
+            Tags = @Tags,
+            Visibility = @Visibility,
+            AllowDownload = @AllowDownload,
+            ShareDate = GETDATE()
+        WHERE ProgressionID = @ProgressionID AND UserID = @UserID;
+        
+        SELECT SharedProgressionID FROM SharedProgressions 
+        WHERE ProgressionID = @ProgressionID AND UserID = @UserID;
+    END
+    ELSE
+    BEGIN
+        -- Create new share
+        INSERT INTO SharedProgressions (ProgressionID, UserID, ShareTitle, ShareDescription, Tags, Visibility, AllowDownload, Status)
+        VALUES (@ProgressionID, @UserID, @ShareTitle, @ShareDescription, @Tags, @Visibility, @AllowDownload, 'Published');
+        
+        SELECT SCOPE_IDENTITY() AS SharedProgressionID;
+    END
+END
+
+-- Browse community progressions with filters
+GO
+CREATE PROCEDURE sp_BrowseCommunityProgressions
+    @CurrentUserID INT = NULL,
+    @SearchTerm NVARCHAR(100) = NULL,
+    @Genre NVARCHAR(50) = NULL,
+    @KeyRoot INT = NULL,
+    @IsKeyMajor BIT = NULL,
+    @SortBy NVARCHAR(20) = 'Recent', -- 'Recent', 'Popular', 'MostLiked', 'MostViewed'
+    @PageNumber INT = 1,
+    @PageSize INT = 20
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    DECLARE @Offset INT = (@PageNumber - 1) * @PageSize;
+    
+    WITH FilteredProgressions AS (
+        SELECT 
+            sp.SharedProgressionID,
+            sp.ProgressionID,
+            sp.UserID,
+            sp.ShareTitle,
+            sp.ShareDescription,
+            sp.Tags,
+            sp.ViewCount,
+            sp.LikeCount,
+            sp.ShareDate,
+            sp.AllowDownload,
+            u.Username AS OwnerUsername,
+            p.KeyRoot,
+            p.IsKeyMajor,
+            p.Tempo,
+            pc.CategoryName,
+            (SELECT COUNT(*) FROM ProgressionChordEvents pce WHERE pce.ProgressionID = p.ProgressionID) AS ChordCount,
+            (SELECT COUNT(*) FROM ProgressionComments pc WHERE pc.SharedProgressionID = sp.SharedProgressionID AND pc.IsDeleted = 0) AS CommentCount,
+            (SELECT AVG(CAST(pr.Rating AS FLOAT)) FROM ProgressionRatings pr WHERE pr.SharedProgressionID = sp.SharedProgressionID) AS AverageRating,
+            (SELECT COUNT(*) FROM ProgressionRatings pr WHERE pr.SharedProgressionID = sp.SharedProgressionID) AS RatingCount,
+            CASE WHEN @CurrentUserID IS NOT NULL AND EXISTS (
+                SELECT 1 FROM ProgressionRatings pr 
+                WHERE pr.SharedProgressionID = sp.SharedProgressionID AND pr.UserID = @CurrentUserID
+            ) THEN 1 ELSE 0 END AS UserHasRated
+        FROM SharedProgressions sp
+        INNER JOIN Progressions p ON sp.ProgressionID = p.ProgressionID
+        INNER JOIN Users u ON sp.UserID = u.UserID
+        LEFT JOIN ProgressionCategories pc ON p.CategoryID = pc.CategoryID
+        WHERE sp.Status = 'Published'
+            AND (sp.Visibility = 'Public' OR (@CurrentUserID IS NOT NULL AND sp.Visibility = 'RegisteredOnly'))
+            AND (@SearchTerm IS NULL OR 
+                 sp.ShareTitle LIKE '%' + @SearchTerm + '%' OR
+                 sp.ShareDescription LIKE '%' + @SearchTerm + '%' OR
+                 sp.Tags LIKE '%' + @SearchTerm + '%')
+            AND (@Genre IS NULL OR sp.Tags LIKE '%' + @Genre + '%' OR pc.CategoryName LIKE '%' + @Genre + '%')
+            AND (@KeyRoot IS NULL OR p.KeyRoot = @KeyRoot)
+            AND (@IsKeyMajor IS NULL OR p.IsKeyMajor = @IsKeyMajor)
+    )
+    SELECT *,
+           (SELECT COUNT(*) FROM FilteredProgressions) AS TotalCount
+    FROM FilteredProgressions
+    ORDER BY 
+        CASE WHEN @SortBy = 'Recent' THEN ShareDate END DESC,
+        CASE WHEN @SortBy = 'Popular' THEN ViewCount END DESC,
+        CASE WHEN @SortBy = 'MostLiked' THEN LikeCount END DESC,
+        CASE WHEN @SortBy = 'MostViewed' THEN ViewCount END DESC
+    OFFSET @Offset ROWS
+    FETCH NEXT @PageSize ROWS ONLY;
+END
+
+-- Get details of a shared progression
+GO
+CREATE PROCEDURE sp_GetSharedProgressionDetails
+    @SharedProgressionID INT,
+    @ViewerUserID INT = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    -- Increment view count
+    UPDATE SharedProgressions
+    SET ViewCount = ViewCount + 1
+    WHERE SharedProgressionID = @SharedProgressionID;
+    
+    -- Get progression details
+    SELECT 
+        sp.SharedProgressionID,
+        sp.ProgressionID,
+        sp.UserID,
+        sp.ShareTitle,
+        sp.ShareDescription,
+        sp.Tags,
+        sp.ViewCount,
+        sp.LikeCount,
+        sp.ShareDate,
+        sp.AllowDownload,
+        sp.Visibility,
+        u.Username AS OwnerUsername,
+        p.ProgressionTitle,
+        p.KeyRoot,
+        p.IsKeyMajor,
+        p.Tempo,
+        p.UploadDate,
+        pc.CategoryName,
+        pc.Color AS CategoryColor,
+        (SELECT COUNT(*) FROM ProgressionComments c WHERE c.SharedProgressionID = sp.SharedProgressionID AND c.IsDeleted = 0) AS CommentCount,
+        (SELECT AVG(CAST(pr.Rating AS FLOAT)) FROM ProgressionRatings pr WHERE pr.SharedProgressionID = sp.SharedProgressionID) AS AverageRating,
+        (SELECT COUNT(*) FROM ProgressionRatings pr WHERE pr.SharedProgressionID = sp.SharedProgressionID) AS RatingCount,
+        CASE WHEN @ViewerUserID IS NOT NULL AND EXISTS (
+            SELECT 1 FROM ProgressionRatings pr 
+            WHERE pr.SharedProgressionID = sp.SharedProgressionID AND pr.UserID = @ViewerUserID
+        ) THEN (SELECT Rating FROM ProgressionRatings WHERE SharedProgressionID = sp.SharedProgressionID AND UserID = @ViewerUserID)
+        ELSE NULL END AS UserRating
+    FROM SharedProgressions sp
+    INNER JOIN Progressions p ON sp.ProgressionID = p.ProgressionID
+    INNER JOIN Users u ON sp.UserID = u.UserID
+    LEFT JOIN ProgressionCategories pc ON p.CategoryID = pc.CategoryID
+    WHERE sp.SharedProgressionID = @SharedProgressionID;
+    
+    -- Get chord events
+    SELECT 
+        ChordEventID,
+        StartTime,
+        Duration,
+        ChordName,
+        NotesCSV,
+        RootNoteChroma,
+        Quality,
+        Extensions,
+        RomanNumeral,
+        ChordFunction,
+        SequenceOrder
+    FROM ProgressionChordEvents pce
+    INNER JOIN SharedProgressions sp ON pce.ProgressionID = sp.ProgressionID
+    WHERE sp.SharedProgressionID = @SharedProgressionID
+    ORDER BY SequenceOrder;
+END
+
+-- Add a comment to a shared progression
+GO
+CREATE PROCEDURE sp_AddProgressionComment
+    @SharedProgressionID INT,
+    @UserID INT,
+    @CommentText NVARCHAR(1000),
+    @ParentCommentID INT = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    -- Verify the shared progression exists
+    IF NOT EXISTS (SELECT 1 FROM SharedProgressions WHERE SharedProgressionID = @SharedProgressionID)
+    BEGIN
+        RAISERROR('Shared progression not found', 16, 1);
+        RETURN;
+    END
+    
+    -- Insert comment
+    INSERT INTO ProgressionComments (SharedProgressionID, UserID, CommentText, ParentCommentID)
+    VALUES (@SharedProgressionID, @UserID, @CommentText, @ParentCommentID);
+    
+    DECLARE @CommentID INT = SCOPE_IDENTITY();
+    
+    -- Notify progression owner (if not commenting on own progression)
+    DECLARE @OwnerUserID INT;
+    SELECT @OwnerUserID = UserID FROM SharedProgressions WHERE SharedProgressionID = @SharedProgressionID;
+    
+    IF @OwnerUserID != @UserID
+    BEGIN
+        DECLARE @CommenterUsername NVARCHAR(100);
+        DECLARE @ProgressionTitle NVARCHAR(255);
+        
+        SELECT @CommenterUsername = Username FROM Users WHERE UserID = @UserID;
+        SELECT @ProgressionTitle = ShareTitle FROM SharedProgressions WHERE SharedProgressionID = @SharedProgressionID;
+        
+        INSERT INTO UserNotifications (UserID, NotificationType, Message, IsRead, CreatedDate)
+        VALUES (@OwnerUserID, 'Comment', 
+                @CommenterUsername + ' commented on your shared progression "' + @ProgressionTitle + '"', 
+                0, GETDATE());
+    END
+    
+    SELECT @CommentID AS CommentID;
+END
+
+-- Rate a shared progression
+GO
+CREATE PROCEDURE sp_RateProgression
+    @SharedProgressionID INT,
+    @UserID INT,
+    @Rating INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    -- Validate rating
+    IF @Rating < 1 OR @Rating > 5
+    BEGIN
+        RAISERROR('Rating must be between 1 and 5', 16, 1);
+        RETURN;
+    END
+    
+    -- Verify the shared progression exists
+    IF NOT EXISTS (SELECT 1 FROM SharedProgressions WHERE SharedProgressionID = @SharedProgressionID)
+    BEGIN
+        RAISERROR('Shared progression not found', 16, 1);
+        RETURN;
+    END
+    
+    -- Insert or update rating
+    IF EXISTS (SELECT 1 FROM ProgressionRatings WHERE SharedProgressionID = @SharedProgressionID AND UserID = @UserID)
+    BEGIN
+        UPDATE ProgressionRatings
+        SET Rating = @Rating, CreatedDate = GETDATE()
+        WHERE SharedProgressionID = @SharedProgressionID AND UserID = @UserID;
+    END
+    ELSE
+    BEGIN
+        INSERT INTO ProgressionRatings (SharedProgressionID, UserID, Rating)
+        VALUES (@SharedProgressionID, @UserID, @Rating);
+    END
+    
+    -- Return updated average rating
+    SELECT AVG(CAST(Rating AS FLOAT)) AS AverageRating,
+           COUNT(*) AS RatingCount
+    FROM ProgressionRatings
+    WHERE SharedProgressionID = @SharedProgressionID;
+END
+
+-- Report inappropriate content
+GO
+CREATE PROCEDURE sp_ReportContent
+    @ReporterUserID INT,
+    @SharedProgressionID INT = NULL,
+    @CommentID INT = NULL,
+    @ViolationType NVARCHAR(100),
+    @ReportDetails NVARCHAR(1000)
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    -- Ensure at least one content type is specified
+    IF @SharedProgressionID IS NULL AND @CommentID IS NULL
+    BEGIN
+        RAISERROR('Must specify either SharedProgressionID or CommentID', 16, 1);
+        RETURN;
+    END
+    
+    -- Insert report
+    INSERT INTO ContentReports (SharedProgressionID, CommentID, ReporterUserID, ViolationType, ReportDetails, Status)
+    VALUES (@SharedProgressionID, @CommentID, @ReporterUserID, @ViolationType, @ReportDetails, 'Pending');
+    
+    DECLARE @ReportID INT = SCOPE_IDENTITY();
+    
+    -- Notify admins (if admin notification system is in place)
+    -- This would need to be implemented based on your admin user identification
+    
+    SELECT @ReportID AS ReportID;
+END
+
+-- Get comments for a shared progression
+GO
+CREATE PROCEDURE sp_GetProgressionComments
+    @SharedProgressionID INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    SELECT 
+        c.CommentID,
+        c.SharedProgressionID,
+        c.UserID,
+        c.ParentCommentID,
+        c.CommentText,
+        c.CreatedDate,
+        c.IsEdited,
+        u.Username
+    FROM ProgressionComments c
+    INNER JOIN Users u ON c.UserID = u.UserID
+    WHERE c.SharedProgressionID = @SharedProgressionID
+        AND c.IsDeleted = 0
+    ORDER BY 
+        CASE WHEN c.ParentCommentID IS NULL THEN c.CommentID ELSE c.ParentCommentID END,
+        c.CreatedDate;
+END
+
+-- Get user's shared progressions
+GO
+CREATE PROCEDURE sp_GetUserSharedProgressions
+    @UserID INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    SELECT 
+        sp.SharedProgressionID,
+        sp.ProgressionID,
+        sp.ShareTitle,
+        sp.ShareDescription,
+        sp.ShareDate,
+        sp.ViewCount,
+        sp.LikeCount,
+        sp.Status,
+        (SELECT COUNT(*) FROM ProgressionComments pc WHERE pc.SharedProgressionID = sp.SharedProgressionID AND pc.IsDeleted = 0) AS CommentCount,
+        (SELECT AVG(CAST(pr.Rating AS FLOAT)) FROM ProgressionRatings pr WHERE pr.SharedProgressionID = sp.SharedProgressionID) AS AverageRating
+    FROM SharedProgressions sp
+    WHERE sp.UserID = @UserID
+    ORDER BY sp.ShareDate DESC;
+END
+
+-- Unshare a progression
+GO
+CREATE PROCEDURE sp_UnshareProgression
+    @SharedProgressionID INT,
+    @UserID INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    -- Verify ownership
+    IF NOT EXISTS (SELECT 1 FROM SharedProgressions WHERE SharedProgressionID = @SharedProgressionID AND UserID = @UserID)
+    BEGIN
+        RAISERROR('Shared progression not found or does not belong to user', 16, 1);
+        RETURN;
+    END
+    
+    -- Delete the shared progression (cascade will handle comments and ratings)
+    DELETE FROM SharedProgressions
+    WHERE SharedProgressionID = @SharedProgressionID AND UserID = @UserID;
+    
+    SELECT 1 AS Success;
+END
+
+GO
+
+GO
+CREATE PROCEDURE sp_ToggleProgressionLike
+    @SharedProgressionID INT,
+    @UserID INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    DECLARE @Liked BIT = 0;
+    
+    -- Check if already liked
+    IF EXISTS (SELECT 1 FROM ProgressionLikes WHERE SharedProgressionID = @SharedProgressionID AND UserID = @UserID)
+    BEGIN
+        -- Unlike
+        DELETE FROM ProgressionLikes 
+        WHERE SharedProgressionID = @SharedProgressionID AND UserID = @UserID;
+        
+        UPDATE SharedProgressions 
+        SET LikeCount = LikeCount - 1 
+        WHERE SharedProgressionID = @SharedProgressionID AND LikeCount > 0;
+        
+        SET @Liked = 0;
+    END
+    ELSE
+    BEGIN
+        -- Like
+        INSERT INTO ProgressionLikes (SharedProgressionID, UserID, CreatedDate)
+        VALUES (@SharedProgressionID, @UserID, GETDATE());
+        
+        UPDATE SharedProgressions 
+        SET LikeCount = LikeCount + 1 
+        WHERE SharedProgressionID = @SharedProgressionID;
+        
+        SET @Liked = 1;
+    END
+    
+    -- Return updated like count and status
+    SELECT 
+        (SELECT LikeCount FROM SharedProgressions WHERE SharedProgressionID = @SharedProgressionID) AS LikeCount,
+        @Liked AS IsLiked;
+END
+
+
+GO
+CREATE PROCEDURE sp_GetUserLikedProgressions
+    @UserID INT,
+    @PageNumber INT = 1,
+    @PageSize INT = 20
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    DECLARE @Offset INT = (@PageNumber - 1) * @PageSize;
+    
+    SELECT 
+        sp.SharedProgressionID,
+        sp.ShareTitle,
+        sp.ShareDescription,
+        sp.ViewCount,
+        sp.LikeCount,
+        sp.ShareDate,
+        u.Username AS OwnerUsername,
+        p.KeyRoot,
+        p.IsKeyMajor,
+        (SELECT COUNT(*) FROM ProgressionComments pc WHERE pc.SharedProgressionID = sp.SharedProgressionID AND pc.IsDeleted = 0) AS CommentCount,
+        pl.CreatedDate AS LikedDate
+    FROM ProgressionLikes pl
+    INNER JOIN SharedProgressions sp ON pl.SharedProgressionID = sp.SharedProgressionID
+    INNER JOIN Progressions p ON sp.ProgressionID = p.ProgressionID
+    INNER JOIN Users u ON sp.UserID = u.UserID
+    WHERE pl.UserID = @UserID
+        AND sp.Status = 'Published'
+    ORDER BY pl.CreatedDate DESC
+    OFFSET @Offset ROWS
+    FETCH NEXT @PageSize ROWS ONLY;
+END
+
+GO
+
+-- =============================================
+-- STORED PROCEDURE: Get All Users for Permission Management
+-- =============================================
+IF OBJECT_ID('sp_GetAllUsersForPermissions', 'P') IS NOT NULL
+    DROP PROCEDURE sp_GetAllUsersForPermissions;
+GO
+
+CREATE PROCEDURE sp_GetAllUsersForPermissions
+    @SearchTerm NVARCHAR(100) = NULL,
+    @RoleFilter NVARCHAR(20) = NULL  -- 'Admin', 'User', 'All'
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    SELECT 
+        UserID,
+        Username,
+        Email,
+        IsAdmin,
+        IsEnabled,
+        RegistrationDate,
+        LastLoginDate,
+        AdminNotes,
+        CASE WHEN IsAdmin = 1 THEN 'Admin' ELSE 'User' END AS UserRole,
+        (SELECT COUNT(*) FROM Progressions WHERE UserID = Users.UserID) AS ProgressionCount,
+        (SELECT COUNT(*) FROM SharedProgressions WHERE UserID = Users.UserID) AS SharedCount
+    FROM Users
+    WHERE 
+        (@SearchTerm IS NULL OR 
+         Username LIKE '%' + @SearchTerm + '%' OR 
+         Email LIKE '%' + @SearchTerm + '%')
+        AND
+        (@RoleFilter IS NULL OR @RoleFilter = 'All' OR
+         (@RoleFilter = 'Admin' AND IsAdmin = 1) OR
+         (@RoleFilter = 'User' AND IsAdmin = 0))
+    ORDER BY 
+        IsAdmin DESC,
+        Username ASC;
+END
+GO
+
+-- =============================================
+-- STORED PROCEDURE: Update User Permissions
+-- =============================================
+IF OBJECT_ID('sp_UpdateUserPermissions', 'P') IS NOT NULL
+    DROP PROCEDURE sp_UpdateUserPermissions;
+GO
+
+CREATE PROCEDURE sp_UpdateUserPermissions
+    @UserID INT,
+    @IsAdmin BIT,
+    @IsEnabled BIT,
+    @AdminNotes NVARCHAR(500) = NULL,
+    @ModifiedByAdminID INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    BEGIN TRANSACTION;
+    
+    DECLARE @OldIsAdmin BIT;
+    DECLARE @OldIsEnabled BIT;
+    DECLARE @Username NVARCHAR(100);
+    
+    -- Get current values
+    SELECT 
+        @OldIsAdmin = IsAdmin,
+        @OldIsEnabled = IsEnabled,
+        @Username = Username
+    FROM Users
+    WHERE UserID = @UserID;
+    
+    -- Update user permissions
+    UPDATE Users
+    SET 
+        IsAdmin = @IsAdmin,
+        IsEnabled = @IsEnabled,
+        AdminNotes = @AdminNotes,
+        LastModified = GETDATE()
+    WHERE UserID = @UserID;
+    
+    -- Create notification for role changes
+    IF @OldIsAdmin != @IsAdmin
+    BEGIN
+        DECLARE @RoleMessage NVARCHAR(500);
+        IF @IsAdmin = 1
+            SET @RoleMessage = 'Your account has been granted administrator privileges.';
+        ELSE
+            SET @RoleMessage = 'Your administrator privileges have been revoked.';
+            
+        INSERT INTO UserNotifications (UserID, NotificationType, Message)
+        VALUES (@UserID, 'Account', @RoleMessage);
+    END
+    
+    -- Create notification for account status changes
+    IF @OldIsEnabled != @IsEnabled
+    BEGIN
+        DECLARE @StatusMessage NVARCHAR(500);
+        IF @IsEnabled = 1
+            SET @StatusMessage = 'Your account has been enabled. You can now access the platform.';
+        ELSE
+            SET @StatusMessage = 'Your account has been disabled. Please contact support for more information.';
+            
+        INSERT INTO UserNotifications (UserID, NotificationType, Message)
+        VALUES (@UserID, 'Account', @StatusMessage);
+    END
+    
+    -- Log the permission change
+    INSERT INTO UserNotifications (UserID, NotificationType, Message, IsRead)
+    VALUES (@ModifiedByAdminID, 'Admin Activity', 
+            'Updated permissions for user: ' + @Username, 1);
+    
+    COMMIT TRANSACTION;
+    
+    SELECT 1 AS Success;
+END
+GO
+
+-- =============================================
+-- STORED PROCEDURE: Get User Details for Permission Management
+-- =============================================
+IF OBJECT_ID('sp_GetUserDetailsForPermissions', 'P') IS NOT NULL
+    DROP PROCEDURE sp_GetUserDetailsForPermissions;
+GO
+
+CREATE PROCEDURE sp_GetUserDetailsForPermissions
+    @UserID INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    SELECT 
+        u.UserID,
+        u.Username,
+        u.Email,
+        u.IsAdmin,
+        u.IsEnabled,
+        u.RegistrationDate,
+        u.LastLoginDate,
+        u.LastModified,
+        u.AdminNotes,
+        (SELECT COUNT(*) FROM Progressions WHERE UserID = u.UserID) AS TotalProgressions,
+        (SELECT COUNT(*) FROM SharedProgressions WHERE UserID = u.UserID) AS SharedProgressions,
+        (SELECT COUNT(*) FROM ProgressionComments WHERE UserID = u.UserID AND IsDeleted = 0) AS TotalComments,
+        (SELECT COUNT(*) FROM ContentReports WHERE ReporterUserID = u.UserID) AS ReportsMade,
+        (SELECT COUNT(*) FROM ContentReports cr 
+         LEFT JOIN SharedProgressions sp ON cr.SharedProgressionID = sp.SharedProgressionID
+         LEFT JOIN ProgressionComments pc ON cr.CommentID = pc.CommentID
+         WHERE (sp.UserID = u.UserID OR pc.UserID = u.UserID)) AS ReportsReceived
+    FROM Users u
+    WHERE u.UserID = @UserID;
+END
+GO
+
+-- =============================================
+-- STORED PROCEDURE: Get System Analytics Overview
+-- =============================================
+IF OBJECT_ID('sp_GetSystemAnalytics', 'P') IS NOT NULL
+    DROP PROCEDURE sp_GetSystemAnalytics;
+GO
+
+CREATE PROCEDURE sp_GetSystemAnalytics
+    @TimeRange NVARCHAR(20) = 'All'  -- 'Today', 'Week', 'Month', 'All'
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    DECLARE @StartDate DATETIME;
+    
+    -- Set date range based on filter
+    IF @TimeRange = 'Today'
+        SET @StartDate = CAST(GETDATE() AS DATE);
+    ELSE IF @TimeRange = 'Week'
+        SET @StartDate = DATEADD(DAY, -7, GETDATE());
+    ELSE IF @TimeRange = 'Month'
+        SET @StartDate = DATEADD(MONTH, -1, GETDATE());
+    ELSE
+        SET @StartDate = '1900-01-01';
+    
+    -- User Statistics
+    SELECT 
+        (SELECT COUNT(*) FROM Users) AS TotalUsers,
+        (SELECT COUNT(*) FROM Users WHERE RegistrationDate >= @StartDate) AS NewUsers,
+        (SELECT COUNT(*) FROM Users WHERE IsAdmin = 1) AS AdminUsers,
+        (SELECT COUNT(*) FROM Users WHERE IsEnabled = 1) AS ActiveUsers,
+        (SELECT COUNT(*) FROM Users WHERE IsEnabled = 0) AS DisabledUsers,
+        (SELECT COUNT(DISTINCT UserID) FROM Users WHERE LastLoginDate >= @StartDate) AS ActiveUsersInPeriod;
+    
+    -- Content Statistics
+    SELECT 
+        (SELECT COUNT(*) FROM Progressions) AS TotalProgressions,
+        (SELECT COUNT(*) FROM Progressions WHERE UploadDate >= @StartDate) AS NewProgressions,
+        (SELECT COUNT(*) FROM SharedProgressions) AS TotalSharedProgressions,
+        (SELECT COUNT(*) FROM SharedProgressions WHERE ShareDate >= @StartDate) AS NewSharedProgressions,
+        (SELECT COUNT(*) FROM SharedProgressions WHERE Status = 'Published') AS PublishedProgressions,
+        (SELECT COUNT(*) FROM SharedProgressions WHERE Status = 'UnderReview') AS UnderReviewProgressions,
+        (SELECT COUNT(*) FROM SharedProgressions WHERE Status = 'Removed') AS RemovedProgressions;
+    
+    -- Community Statistics
+    SELECT 
+        (SELECT COALESCE(SUM(ViewCount), 0) FROM SharedProgressions) AS TotalViews,
+        (SELECT COALESCE(SUM(LikeCount), 0) FROM SharedProgressions) AS TotalLikes,
+        (SELECT COUNT(*) FROM ProgressionComments WHERE IsDeleted = 0) AS TotalComments,
+        (SELECT COUNT(*) FROM ProgressionComments WHERE CreatedDate >= @StartDate AND IsDeleted = 0) AS NewComments,
+        (SELECT COUNT(*) FROM ProgressionLikes WHERE CreatedDate >= @StartDate) AS NewLikes;
+    
+    -- Learning Statistics  
+    SELECT 
+        (SELECT COUNT(DISTINCT UserID) FROM UserLessonProgress) AS UsersWithProgress,
+        (SELECT COUNT(*) FROM UserLessonProgress WHERE Status = 'Completed') AS CompletedLessons,
+        (SELECT COUNT(*) FROM UserLessonProgress WHERE Status = 'InProgress') AS InProgressLessons,
+        (SELECT COUNT(*) FROM UserQuizAttempts) AS TotalQuizAttempts,
+        (SELECT COUNT(*) FROM UserQuizAttempts WHERE Passed = 1) AS PassedQuizzes,
+        (SELECT AVG(CAST(Score AS FLOAT)) FROM UserQuizAttempts) AS AverageQuizScore;
+    
+    -- Moderation Statistics
+    SELECT 
+        (SELECT COUNT(*) FROM ContentReports) AS TotalReports,
+        (SELECT COUNT(*) FROM ContentReports WHERE Status = 'Pending') AS PendingReports,
+        (SELECT COUNT(*) FROM ContentReports WHERE Status = 'Resolved') AS ResolvedReports,
+        (SELECT COUNT(*) FROM ContentReports WHERE Status = 'Dismissed') AS DismissedReports,
+        (SELECT COUNT(*) FROM ContentReports WHERE ReportDate >= @StartDate) AS NewReports;
+END
+GO
+
+-- =============================================
+-- STORED PROCEDURE: Get User Growth Analytics
+-- =============================================
+IF OBJECT_ID('sp_GetUserGrowthAnalytics', 'P') IS NOT NULL
+    DROP PROCEDURE sp_GetUserGrowthAnalytics;
+GO
+
+CREATE PROCEDURE sp_GetUserGrowthAnalytics
+    @Days INT = 30
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    -- Get daily user registrations for the past N days
+    WITH DateRange AS (
+        SELECT CAST(DATEADD(DAY, -@Days, GETDATE()) AS DATE) AS StartDate,
+               CAST(GETDATE() AS DATE) AS EndDate
+    ),
+    AllDates AS (
+        SELECT CAST(DATEADD(DAY, number, StartDate) AS DATE) AS Date
+        FROM DateRange
+        CROSS JOIN master..spt_values
+        WHERE type = 'P' AND number <= DATEDIFF(DAY, StartDate, EndDate)
+    )
+    SELECT 
+        ad.Date,
+        COALESCE(COUNT(u.UserID), 0) AS NewUsers,
+        (SELECT COUNT(*) FROM Users WHERE CAST(RegistrationDate AS DATE) <= ad.Date) AS CumulativeUsers
+    FROM AllDates ad
+    LEFT JOIN Users u ON CAST(u.RegistrationDate AS DATE) = ad.Date
+    GROUP BY ad.Date
+    ORDER BY ad.Date;
+END
+GO
+
+-- =============================================
+-- STORED PROCEDURE: Get Content Engagement Analytics
+-- =============================================
+IF OBJECT_ID('sp_GetContentEngagementAnalytics', 'P') IS NOT NULL
+    DROP PROCEDURE sp_GetContentEngagementAnalytics;
+GO
+
+CREATE PROCEDURE sp_GetContentEngagementAnalytics
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    -- Top shared progressions by views
+    SELECT TOP 10
+        sp.SharedProgressionID,
+        sp.ShareTitle,
+        u.Username AS Author,
+        sp.ViewCount,
+        sp.LikeCount,
+        (SELECT COUNT(*) FROM ProgressionComments WHERE SharedProgressionID = sp.SharedProgressionID AND IsDeleted = 0) AS CommentCount,
+        sp.ShareDate
+    FROM SharedProgressions sp
+    INNER JOIN Users u ON sp.UserID = u.UserID
+    WHERE sp.Status = 'Published'
+    ORDER BY sp.ViewCount DESC;
+    
+    -- Top contributors
+    SELECT TOP 10
+        u.UserID,
+        u.Username,
+        COUNT(sp.SharedProgressionID) AS SharedCount,
+        COALESCE(SUM(sp.ViewCount), 0) AS TotalViews,
+        COALESCE(SUM(sp.LikeCount), 0) AS TotalLikes
+    FROM Users u
+    INNER JOIN SharedProgressions sp ON u.UserID = sp.UserID
+    WHERE sp.Status = 'Published'
+    GROUP BY u.UserID, u.Username
+    ORDER BY SharedCount DESC;
+END
+GO
+
+-- =============================================
+-- STORED PROCEDURE: Get Learning Analytics
+-- =============================================
+IF OBJECT_ID('sp_GetLearningAnalytics', 'P') IS NOT NULL
+    DROP PROCEDURE sp_GetLearningAnalytics;
+GO
+
+CREATE PROCEDURE sp_GetLearningAnalytics
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    -- Lesson completion stats
+    SELECT 
+        lm.ModuleTitle,
+        COUNT(DISTINCT ulp.UserID) AS UsersEnrolled,
+        COUNT(CASE WHEN ulp.Status = 'Completed' THEN 1 END) AS CompletedCount,
+        COUNT(CASE WHEN ulp.Status = 'InProgress' THEN 1 END) AS InProgressCount,
+        CAST(COUNT(CASE WHEN ulp.Status = 'Completed' THEN 1 END) AS FLOAT) / 
+            NULLIF(COUNT(ulp.ProgressID), 0) * 100 AS CompletionRate
+    FROM LearningModules lm
+    LEFT JOIN LearningLessons ll ON lm.ModuleID = ll.ModuleID
+    LEFT JOIN UserLessonProgress ulp ON ll.LessonID = ulp.LessonID
+    WHERE lm.IsPublished = 1
+    GROUP BY lm.ModuleID, lm.ModuleTitle
+    ORDER BY UsersEnrolled DESC;
+    
+    -- Quiz performance
+    SELECT 
+        lq.QuizTitle,
+        COUNT(uqa.AttemptID) AS TotalAttempts,
+        COUNT(CASE WHEN uqa.Passed = 1 THEN 1 END) AS PassedAttempts,
+        AVG(CAST(uqa.Score AS FLOAT)) AS AverageScore,
+        CAST(COUNT(CASE WHEN uqa.Passed = 1 THEN 1 END) AS FLOAT) / 
+            NULLIF(COUNT(uqa.AttemptID), 0) * 100 AS PassRate
+    FROM LearningQuizzes lq
+    LEFT JOIN UserQuizAttempts uqa ON lq.QuizID = uqa.QuizID
+    GROUP BY lq.QuizID, lq.QuizTitle
+    ORDER BY TotalAttempts DESC;
+END
+GO
+
+-- =============================================
+-- Stored Procedure: Validate Admin Credentials
+-- =============================================
+IF OBJECT_ID('sp_ValidateAdminCredentials', 'P') IS NOT NULL
+    DROP PROCEDURE sp_ValidateAdminCredentials;
+GO
+
+CREATE PROCEDURE sp_ValidateAdminCredentials
+    @Username NVARCHAR(100)
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    SELECT 
+        UserID,
+        Username,
+        Email,
+        PasswordHash,
+        IsEnabled,
+        IsAdmin,
+        LastLoginDate
+    FROM Users
+    WHERE Username = @Username AND IsAdmin = 1 AND IsEnabled = 1;
+END
+GO
+
+
+
+-- =============================================
+-- Stored Procedure: Update Last Login Date
+-- =============================================
+IF OBJECT_ID('sp_UpdateLastLoginDate', 'P') IS NOT NULL
+    DROP PROCEDURE sp_UpdateLastLoginDate;
+GO
+
+CREATE PROCEDURE sp_UpdateLastLoginDate
+    @UserID INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    UPDATE Users
+    SET LastLoginDate = GETDATE()
+    WHERE UserID = @UserID;
+END
+GO
+
+-- =============================================
+-- Stored Procedure: Get Pending Moderation Queue
+-- =============================================
+IF OBJECT_ID('sp_GetPendingModerationQueue', 'P') IS NOT NULL
+    DROP PROCEDURE sp_GetPendingModerationQueue;
+GO
+
+CREATE PROCEDURE sp_GetPendingModerationQueue
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    SELECT 
+        cr.ReportID,
+        cr.SharedProgressionID,
+        cr.CommentID,
+        cr.ReporterUserID,
+        reporter.Username AS ReporterUsername,
+        cr.ViolationType,
+        cr.ReportDetails,
+        cr.ReportDate,
+        cr.Status,
+        sp.ShareTitle AS ProgressionTitle,
+        sp.UserID AS ContentOwnerID,
+        owner.Username AS ContentOwnerUsername,
+        pc.CommentText,
+        commenter.Username AS CommenterUsername
+    FROM ContentReports cr
+    LEFT JOIN Users reporter ON cr.ReporterUserID = reporter.UserID
+    LEFT JOIN SharedProgressions sp ON cr.SharedProgressionID = sp.SharedProgressionID
+    LEFT JOIN Users owner ON sp.UserID = owner.UserID
+    LEFT JOIN ProgressionComments pc ON cr.CommentID = pc.CommentID
+    LEFT JOIN Users commenter ON pc.UserID = commenter.UserID
+    WHERE cr.Status = 'Pending'
+    ORDER BY cr.ReportDate ASC;
+END
+GO
+
+-- =============================================
+-- Stored Procedure: Get Moderation Statistics
+-- =============================================
+IF OBJECT_ID('sp_GetModerationStatistics', 'P') IS NOT NULL
+    DROP PROCEDURE sp_GetModerationStatistics;
+GO
+
+CREATE PROCEDURE sp_GetModerationStatistics
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    SELECT 
+        (SELECT COUNT(*) FROM ContentReports WHERE Status = 'Pending') AS PendingReports,
+        (SELECT COUNT(*) FROM ContentReports WHERE Status = 'Resolved') AS ResolvedReports,
+        (SELECT COUNT(*) FROM ContentReports WHERE Status = 'Dismissed') AS DismissedReports,
+        (SELECT COUNT(*) FROM SharedProgressions WHERE Status = 'UnderReview') AS ProgressionsUnderReview,
+        (SELECT COUNT(*) FROM SharedProgressions WHERE Status = 'Removed') AS RemovedProgressions;
+END
+GO
+
+-- =============================================
+-- Stored Procedure: Apply Moderation Action
+-- =============================================
+IF OBJECT_ID('sp_ApplyModerationAction', 'P') IS NOT NULL
+    DROP PROCEDURE sp_ApplyModerationAction;
+GO
+
+CREATE PROCEDURE sp_ApplyModerationAction
+    @ReportID INT,
+    @ModeratorUserID INT,
+    @Action NVARCHAR(20), -- 'Approve', 'Remove', 'Warn'
+    @AdminNotes NVARCHAR(500)
+AS
+BEGIN
+    SET NOCOUNT ON;
+    BEGIN TRANSACTION;
+    
+    DECLARE @SharedProgressionID INT;
+    DECLARE @CommentID INT;
+    DECLARE @ContentOwnerID INT;
+    DECLARE @ReportStatus NVARCHAR(20);
+    
+    -- Get report details
+    SELECT 
+        @SharedProgressionID = SharedProgressionID,
+        @CommentID = CommentID
+    FROM ContentReports
+    WHERE ReportID = @ReportID;
+    
+    -- Get content owner
+    IF @SharedProgressionID IS NOT NULL
+    BEGIN
+        SELECT @ContentOwnerID = UserID FROM SharedProgressions WHERE SharedProgressionID = @SharedProgressionID;
+    END
+    ELSE IF @CommentID IS NOT NULL
+    BEGIN
+        SELECT @ContentOwnerID = UserID FROM ProgressionComments WHERE CommentID = @CommentID;
+    END
+    
+    -- Apply action
+    IF @Action = 'Approve'
+    BEGIN
+        SET @ReportStatus = 'Dismissed';
+        -- No action needed on content
+    END
+    ELSE IF @Action = 'Remove'
+    BEGIN
+        SET @ReportStatus = 'Resolved';
+        
+        IF @SharedProgressionID IS NOT NULL
+        BEGIN
+            UPDATE SharedProgressions
+            SET Status = 'Removed', ReviewNotes = @AdminNotes
+            WHERE SharedProgressionID = @SharedProgressionID;
+        END
+        ELSE IF @CommentID IS NOT NULL
+        BEGIN
+            UPDATE ProgressionComments
+            SET IsDeleted = 1
+            WHERE CommentID = @CommentID;
+        END
+        
+        -- Send notification to content owner
+        IF @ContentOwnerID IS NOT NULL
+        BEGIN
+            INSERT INTO UserNotifications (UserID, NotificationType, Message)
+            VALUES (@ContentOwnerID, 'Moderation', 'Your content has been removed by moderators due to policy violations.');
+        END
+    END
+    ELSE IF @Action = 'Warn'
+    BEGIN
+        SET @ReportStatus = 'Resolved';
+        
+        IF @SharedProgressionID IS NOT NULL
+        BEGIN
+            UPDATE SharedProgressions
+            SET Status = 'UnderReview', ReviewNotes = @AdminNotes
+            WHERE SharedProgressionID = @SharedProgressionID;
+        END
+        
+        -- Send warning notification to content owner
+        IF @ContentOwnerID IS NOT NULL
+        BEGIN
+            INSERT INTO UserNotifications (UserID, NotificationType, Message)
+            VALUES (@ContentOwnerID, 'Moderation', 'Your content has received a warning from moderators. Please review community guidelines.');
+        END
+    END
+    
+    -- Update report
+    UPDATE ContentReports
+    SET Status = @ReportStatus,
+        AdminNotes = @AdminNotes,
+        ResolvedDate = GETDATE(),
+        ModeratedBy = @ModeratorUserID
+    WHERE ReportID = @ReportID;
+    
+    COMMIT TRANSACTION;
+END
+GO
+
+-- =============================================
+-- Stored Procedure: Get Report Details
+-- =============================================
+IF OBJECT_ID('sp_GetReportDetails', 'P') IS NOT NULL
+    DROP PROCEDURE sp_GetReportDetails;
+GO
+
+CREATE PROCEDURE sp_GetReportDetails
+    @ReportID INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    SELECT 
+        cr.ReportID,
+        cr.SharedProgressionID,
+        cr.CommentID,
+        cr.ReporterUserID,
+        reporter.Username AS ReporterUsername,
+        reporter.Email AS ReporterEmail,
+        cr.ViolationType,
+        cr.ReportDetails,
+        cr.ReportDate,
+        cr.Status,
+        cr.AdminNotes,
+        cr.ResolvedDate,
+        cr.ModeratedBy,
+        moderator.Username AS ModeratorUsername,
+        sp.ShareTitle AS ProgressionTitle,
+        sp.ShareDescription AS ProgressionDescription,
+        sp.Tags AS ProgressionTags,
+        sp.Status AS ProgressionStatus,
+        sp.UserID AS ContentOwnerID,
+        owner.Username AS ContentOwnerUsername,
+        owner.Email AS ContentOwnerEmail,
+        pc.CommentText,
+        pc.CreatedDate AS CommentDate,
+        pc.IsDeleted AS CommentDeleted,
+        commenter.Username AS CommenterUsername,
+        commenter.Email AS CommenterEmail
+    FROM ContentReports cr
+    LEFT JOIN Users reporter ON cr.ReporterUserID = reporter.UserID
+    LEFT JOIN Users moderator ON cr.ModeratedBy = moderator.UserID
+    LEFT JOIN SharedProgressions sp ON cr.SharedProgressionID = sp.SharedProgressionID
+    LEFT JOIN Users owner ON sp.UserID = owner.UserID
+    LEFT JOIN ProgressionComments pc ON cr.CommentID = pc.CommentID
+    LEFT JOIN Users commenter ON pc.UserID = commenter.UserID
+    WHERE cr.ReportID = @ReportID;
+END
+GO
+
+-- =============================================
+-- STORED PROCEDURE: Generate 2FA Code
+-- =============================================
+IF OBJECT_ID('sp_GenerateAdminTwoFactorCode', 'P') IS NOT NULL
+    DROP PROCEDURE sp_GenerateAdminTwoFactorCode;
+GO
+
+CREATE PROCEDURE sp_GenerateAdminTwoFactorCode
+    @UserID INT,
+    @IPAddress NVARCHAR(45) = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    -- Mark any existing unused codes as expired
+    UPDATE AdminTwoFactorCodes
+    SET IsUsed = 1
+    WHERE UserID = @UserID AND IsUsed = 0;
+    
+    -- Generate random 6-digit code
+    DECLARE @Code NVARCHAR(6);
+    SET @Code = RIGHT('000000' + CAST(ABS(CHECKSUM(NEWID())) % 1000000 AS NVARCHAR(6)), 6);
+    
+    -- Set expiration time (5 minutes from now)
+    DECLARE @ExpirationTime DATETIME;
+    SET @ExpirationTime = DATEADD(MINUTE, 5, GETDATE());
+    
+    -- Insert new code
+    INSERT INTO AdminTwoFactorCodes (UserID, Code, ExpirationTime, IPAddress)
+    VALUES (@UserID, @Code, @ExpirationTime, @IPAddress);
+    
+    -- Return the code
+    SELECT @Code AS Code, @ExpirationTime AS ExpirationTime;
+END
+GO
+
+-- =============================================
+-- STORED PROCEDURE: Verify 2FA Code
+-- =============================================
+IF OBJECT_ID('sp_VerifyAdminTwoFactorCode', 'P') IS NOT NULL
+    DROP PROCEDURE sp_VerifyAdminTwoFactorCode;
+GO
+
+CREATE PROCEDURE sp_VerifyAdminTwoFactorCode
+    @UserID INT,
+    @Code NVARCHAR(6)
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    DECLARE @CodeID INT;
+    DECLARE @IsValid BIT = 0;
+    
+    -- Check if code exists, is unused, and not expired
+    SELECT @CodeID = CodeID
+    FROM AdminTwoFactorCodes
+    WHERE UserID = @UserID 
+        AND Code = @Code 
+        AND IsUsed = 0 
+        AND ExpirationTime > GETDATE();
+    
+    IF @CodeID IS NOT NULL
+    BEGIN
+        -- Mark code as used
+        UPDATE AdminTwoFactorCodes
+        SET IsUsed = 1
+        WHERE CodeID = @CodeID;
+        
+        SET @IsValid = 1;
+    END
+    
+    SELECT @IsValid AS IsValid;
+END
+GO
+
+-- =============================================
+-- STORED PROCEDURE: Clean Up Expired 2FA Codes
+-- =============================================
+IF OBJECT_ID('sp_CleanupExpiredTwoFactorCodes', 'P') IS NOT NULL
+    DROP PROCEDURE sp_CleanupExpiredTwoFactorCodes;
+GO
+
+CREATE PROCEDURE sp_CleanupExpiredTwoFactorCodes
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    -- Delete codes older than 24 hours
+    DELETE FROM AdminTwoFactorCodes
+    WHERE CreatedDate < DATEADD(HOUR, -24, GETDATE());
+    
+    SELECT @@ROWCOUNT AS CodesDeleted;
+END
+GO
+
+-- =============================================
+-- STORED PROCEDURE: Get All Guidelines (Public)
+-- =============================================
+IF OBJECT_ID('sp_GetCommunityGuidelines', 'P') IS NOT NULL
+    DROP PROCEDURE sp_GetCommunityGuidelines;
+GO
+
+CREATE PROCEDURE sp_GetCommunityGuidelines
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    SELECT 
+        GuidelineID,
+        SectionTitle,
+        SectionContent,
+        SectionOrder,
+        LastModified,
+        Version
+    FROM CommunityGuidelines
+    WHERE IsActive = 1
+    ORDER BY SectionOrder ASC;
+END
+GO
+
+-- =============================================
+-- STORED PROCEDURE: Get Guidelines for Admin Edit
+-- =============================================
+IF OBJECT_ID('sp_GetGuidelinesForAdmin', 'P') IS NOT NULL
+    DROP PROCEDURE sp_GetGuidelinesForAdmin;
+GO
+
+CREATE PROCEDURE sp_GetGuidelinesForAdmin
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    SELECT 
+        g.GuidelineID,
+        g.SectionTitle,
+        g.SectionContent,
+        g.SectionOrder,
+        g.IsActive,
+        g.LastModified,
+        g.ModifiedByUserID,
+        u.Username AS ModifiedByUsername,
+        g.Version
+    FROM CommunityGuidelines g
+    LEFT JOIN Users u ON g.ModifiedByUserID = u.UserID
+    ORDER BY g.SectionOrder ASC;
+END
+GO
+
+-- =============================================
+-- STORED PROCEDURE: Update Guideline Section
+-- =============================================
+IF OBJECT_ID('sp_UpdateGuidelineSection', 'P') IS NOT NULL
+    DROP PROCEDURE sp_UpdateGuidelineSection;
+GO
+
+CREATE PROCEDURE sp_UpdateGuidelineSection
+    @GuidelineID INT,
+    @SectionTitle NVARCHAR(200),
+    @SectionContent NVARCHAR(MAX),
+    @SectionOrder INT,
+    @IsActive BIT,
+    @ModifiedByUserID INT,
+    @ChangeNote NVARCHAR(500) = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+    BEGIN TRANSACTION;
+    
+    DECLARE @OldTitle NVARCHAR(200);
+    DECLARE @OldContent NVARCHAR(MAX);
+    DECLARE @OldVersion INT;
+    
+    -- Get current version and content for history
+    SELECT 
+        @OldTitle = SectionTitle,
+        @OldContent = SectionContent,
+        @OldVersion = Version
+    FROM CommunityGuidelines
+    WHERE GuidelineID = @GuidelineID;
+    
+    -- Insert into history
+    INSERT INTO GuidelineHistory (GuidelineID, SectionTitle, SectionContent, ModifiedByUserID, ChangeNote, Version)
+    VALUES (@GuidelineID, @OldTitle, @OldContent, @ModifiedByUserID, @ChangeNote, @OldVersion);
+    
+    -- Update guideline
+    UPDATE CommunityGuidelines
+    SET 
+        SectionTitle = @SectionTitle,
+        SectionContent = @SectionContent,
+        SectionOrder = @SectionOrder,
+        IsActive = @IsActive,
+        LastModified = GETDATE(),
+        ModifiedByUserID = @ModifiedByUserID,
+        Version = @OldVersion + 1
+    WHERE GuidelineID = @GuidelineID;
+    
+    COMMIT TRANSACTION;
+    
+    SELECT 1 AS Success;
+END
+GO
+
+-- =============================================
+-- STORED PROCEDURE: Add New Guideline Section
+-- =============================================
+IF OBJECT_ID('sp_AddGuidelineSection', 'P') IS NOT NULL
+    DROP PROCEDURE sp_AddGuidelineSection;
+GO
+
+CREATE PROCEDURE sp_AddGuidelineSection
+    @SectionTitle NVARCHAR(200),
+    @SectionContent NVARCHAR(MAX),
+    @SectionOrder INT,
+    @ModifiedByUserID INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    INSERT INTO CommunityGuidelines (SectionTitle, SectionContent, SectionOrder, ModifiedByUserID)
+    VALUES (@SectionTitle, @SectionContent, @SectionOrder, @ModifiedByUserID);
+    
+    SELECT SCOPE_IDENTITY() AS GuidelineID;
+END
+GO
+
+-- =============================================
+-- STORED PROCEDURE: Delete Guideline Section
+-- =============================================
+IF OBJECT_ID('sp_DeleteGuidelineSection', 'P') IS NOT NULL
+    DROP PROCEDURE sp_DeleteGuidelineSection;
+GO
+
+CREATE PROCEDURE sp_DeleteGuidelineSection
+    @GuidelineID INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    -- Soft delete by marking as inactive
+    UPDATE CommunityGuidelines
+    SET IsActive = 0
+    WHERE GuidelineID = @GuidelineID;
+    
+    SELECT 1 AS Success;
+END
+GO
+
+-- =============================================
+-- Important Data Population
+-- =============================================
+
+-- Insert Lesson Categories
+INSERT INTO LessonCategories (CategoryName, Description, DisplayOrder) VALUES
+('Chord Construction', 'Learn how to build chords from scratch', 1),
+('Harmonic Function', 'Understand the role chords play in progressions', 2),
+('Voice Leading', 'Master smooth transitions between chords', 3),
+('Modal Harmony', 'Explore modes and modal interchange', 4),
+('Advanced Techniques', 'Discover sophisticated harmonic concepts', 5);
+
+-- Insert Sample Lessons
+DECLARE @ChordConstructionID INT = (SELECT CategoryID FROM LessonCategories WHERE CategoryName = 'Chord Construction');
+DECLARE @HarmonicFunctionID INT = (SELECT CategoryID FROM LessonCategories WHERE CategoryName = 'Harmonic Function');
+
+INSERT INTO Lessons (CategoryID, LessonSlug, LessonTitle, Description, DifficultyLevel, DisplayOrder, EstimatedMinutes, HasTutorial) VALUES
+-- Chord Construction Lessons
+(@ChordConstructionID, 'basic-triads', 'Understanding Basic Triads', 'Learn the three fundamental chord types: major, minor, and diminished', 'Beginner', 1, 15, 1),
+(@ChordConstructionID, 'seventh-chords', 'Introduction to Seventh Chords', 'Expand your harmonic palette with four-note chords', 'Beginner', 2, 20, 1),
+(@ChordConstructionID, 'extended-chords', 'Extended Chords (9ths, 11ths, 13ths)', 'Explore richer harmonic colors with extended voicings', 'Intermediate', 3, 25, 1),
+(@ChordConstructionID, 'altered-chords', 'Altered Chords and Tensions', 'Add color and tension through chord alterations', 'Advanced', 4, 30, 1),
+
+-- Harmonic Function Lessons
+(@HarmonicFunctionID, 'tonic-function', 'The Tonic Function', 'Understand the role of home base in harmony', 'Beginner', 1, 15, 1),
+(@HarmonicFunctionID, 'dominant-function', 'The Dominant Function', 'Learn about tension and resolution in chord progressions', 'Beginner', 2, 20, 1),
+(@HarmonicFunctionID, 'subdominant-function', 'The Subdominant Function', 'Explore pre-dominant harmony and departure from tonic', 'Intermediate', 3, 20, 1),
+(@HarmonicFunctionID, 'functional-harmony', 'Functional Chord Progressions', 'Master the T-S-D-T cycle and common progressions', 'Intermediate', 4, 25, 1);
+
+GO

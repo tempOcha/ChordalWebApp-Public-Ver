@@ -1,0 +1,365 @@
+﻿body {
+}
+/* ==========================================
+   CHORDAL LEARNING CENTRE STYLES
+   Train Station Theme - Educational Journey
+   ========================================== */
+
+/* ==========================================
+   HERO SECTION WITH WAVES
+   ========================================== */
+.lc-hero-section {
+    position: relative;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    background: var(--color-soft-green);
+    padding: 0;
+}
+
+#lc-wave-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    opacity: 0.3;
+}
+
+.lc-hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(245, 250, 248, 0.9) 0%, rgba(245, 250, 248, 0.6) 100%);
+    z-index: 2;
+}
+
+.lc-hero-content {
+    position: relative;
+    z-index: 3;
+    text-align: center;
+    padding: var(--spacing-xl) 0;
+}
+
+.lc-hero-title {
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 700;
+    margin-bottom: var(--spacing-md);
+    color: var(--color-text-primary);
+}
+
+.lc-hero-subtitle {
+    font-size: var(--text-lg);
+    color: var(--color-text-muted);
+    max-width: 700px;
+    margin: 0 auto var(--spacing-lg);
+    line-height: 1.7;
+}
+
+/* ==========================================
+   PROGRESS SUMMARY CARD
+   ========================================== */
+.lc-progress-summary {
+    background: var(--color-white);
+    border: var(--border-width) solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    margin-bottom: var(--spacing-xl);
+    transition: all var(--transition-base);
+}
+
+    .lc-progress-summary:hover {
+        border-color: var(--color-teal);
+        box-shadow: var(--shadow-sm);
+    }
+
+.lc-progress-title {
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.lc-progress-description {
+    color: var(--color-text-muted);
+    font-size: var(--text-base);
+    margin-bottom: var(--spacing-lg);
+}
+
+.lc-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-md);
+}
+
+.lc-stat-card {
+    background: var(--color-soft-green);
+    border: var(--border-width) solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-lg);
+    text-align: center;
+    transition: all var(--transition-base);
+}
+
+    .lc-stat-card:hover {
+        border-color: var(--color-teal);
+        transform: translateY(-2px);
+    }
+
+.lc-stat-value {
+    font-size: var(--text-4xl);
+    font-weight: 700;
+    color: var(--color-teal);
+    display: block;
+    margin-bottom: var(--spacing-xs);
+}
+
+.lc-stat-label {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ==========================================
+   RECOMMENDED SECTION
+   ========================================== */
+.lc-recommended-section {
+    background: var(--color-light-gray);
+    border: var(--border-width) solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    margin-bottom: var(--spacing-xl);
+}
+
+.lc-recommended-title {
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin-bottom: var(--spacing-lg);
+}
+
+/* ==========================================
+   CATEGORY SECTIONS
+   ========================================== */
+.lc-category-section {
+    background: var(--color-white);
+    border: var(--border-width) solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    margin-bottom: var(--spacing-xl);
+    transition: all var(--transition-base);
+}
+
+    .lc-category-section:hover {
+        border-color: var(--color-teal);
+        box-shadow: var(--shadow-sm);
+    }
+
+.lc-category-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--spacing-lg);
+    padding-bottom: var(--spacing-md);
+    border-bottom: var(--border-width-thick) solid var(--border-color);
+}
+
+.lc-category-info {
+    flex: 1;
+}
+
+.lc-category-title {
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.lc-category-description {
+    font-size: var(--text-base);
+    color: var(--color-text-muted);
+    line-height: 1.6;
+}
+
+.lc-category-progress {
+    text-align: right;
+    min-width: 200px;
+}
+
+.lc-progress-bar-container {
+    width: 200px;
+    height: 8px;
+    background: var(--color-light-gray);
+    border: var(--border-width) solid var(--border-color);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: var(--spacing-xs);
+}
+
+.lc-progress-bar-fill {
+    height: 100%;
+    background: var(--color-teal);
+    border-radius: 10px;
+    transition: width 0.5s ease;
+}
+
+.lc-progress-text {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+}
+
+/* ==========================================
+   LESSONS GRID
+   ========================================== */
+.lc-lessons-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--spacing-lg);
+}
+
+.lc-lesson-card {
+    background: var(--color-white);
+    border: var(--border-width) solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-lg);
+    transition: all var(--transition-base);
+    cursor: pointer;
+    position: relative;
+}
+
+    .lc-lesson-card:hover {
+        border-color: var(--color-teal);
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-sm);
+    }
+
+.lc-lesson-status {
+    position: absolute;
+    top: var(--spacing-md);
+    right: var(--spacing-md);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    border: var(--border-width-thick) solid;
+}
+
+    .lc-lesson-status.completed {
+        background: var(--color-teal);
+        border-color: var(--color-teal);
+        color: var(--color-white);
+    }
+
+    .lc-lesson-status.in-progress {
+        background: var(--color-accent-pink);
+        border-color: var(--color-accent-pink);
+        color: var(--color-white);
+    }
+
+    .lc-lesson-status.not-started {
+        background: var(--color-light-gray);
+        border-color: var(--border-color);
+        color: var(--color-text-muted);
+    }
+
+.lc-lesson-title {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-bottom: var(--spacing-sm);
+    padding-right: 40px;
+    line-height: 1.3;
+}
+
+.lc-lesson-description {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    line-height: 1.6;
+    margin-bottom: var(--spacing-md);
+}
+
+.lc-lesson-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+    padding-top: var(--spacing-md);
+    border-top: var(--border-width) solid var(--border-color);
+}
+
+.lc-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+}
+
+.lc-difficulty-badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: var(--text-xs);
+    font-weight: 600;
+    border: var(--border-width) solid;
+}
+
+.lc-difficulty-beginner {
+    background: var(--color-soft-green);
+    border-color: var(--color-teal);
+    color: var(--color-teal);
+}
+
+.lc-difficulty-intermediate {
+    background: #fff3e0;
+    border-color: #f57c00;
+    color: #f57c00;
+}
+
+.lc-difficulty-advanced {
+    background: #ffebee;
+    border-color: var(--color-accent-pink);
+    color: var(--color-accent-pink);
+}
+
+/* ==========================================
+   RESPONSIVE DESIGN
+   ========================================== */
+@media (max-width: 992px) {
+    .lc-category-header {
+        flex-direction: column;
+        gap: var(--spacing-md);
+    }
+
+    .lc-category-progress {
+        text-align: left;
+        width: 100%;
+    }
+
+    .lc-progress-bar-container {
+        width: 100%;
+    }
+
+    .lc-lessons-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .lc-hero-title {
+        font-size: var(--text-3xl);
+    }
+
+    .lc-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .lc-lessons-grid {
+        grid-template-columns: 1fr;
+    }
+}

@@ -1,0 +1,158 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Chordal.master.cs" Inherits="ChordalWebApp.Chordal" %>
+
+<!DOCTYPE html>
+
+
+<html>
+<head runat="server">
+    <title><asp:ContentPlaceHolder ID="TitleContent" runat="server" /></title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Mona+Sans:ital,wght@0,200..900;1,200..900&family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&display=swap" rel="stylesheet">
+
+    
+    <!-- Custom Styles -->
+    <link href="/Styles/ChordalStyles.css" rel="stylesheet" type="text/css" /> 
+    
+    <!-- Anime.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    
+    <!-- p5.js -->
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.11.11/lib/p5.min.js"></script>
+    
+    <asp:ContentPlaceHolder ID="HeadContent" runat="server">
+    </asp:ContentPlaceHolder>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <!-- Modern Bootstrap Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-light chordal-navbar">
+            <div class="container">
+                <a class="navbar-brand brand-logo" href="~/LandingPage.aspx">
+                    <span class="brand-text">Chordal</span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
+                        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="LandingPage.aspx">Home</a>
+                        </li>
+                        <asp:PlaceHolder ID="AnonymousUserNav" runat="server">
+                            <li class="nav-item">
+                                <a class="nav-link" href="CommunityBrowse.aspx">Community</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link btn-nav-register" href="Register.aspx">Register</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="Login.aspx">Login</a>
+                            </li>
+                        </asp:PlaceHolder>
+                        <asp:PlaceHolder ID="AuthenticatedUserNav" runat="server" Visible="false">
+                            <li class="nav-item">
+                                <a class="nav-link" href="Guidelines.aspx">Guideline</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="UploadProgression.aspx">Upload</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="ProgressionCategories.aspx">Categories</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="MyProgressionsListEnhanced.aspx">My Progressions</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="LearningCentre.aspx">Learning</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="MyProgress.aspx">My Progress</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="CommunityBrowse.aspx">Community</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="UpdateProfile.aspx">Profile</a>
+                            </li>
+                            <li class="nav-item">
+                                <asp:HyperLink ID="lnkNotifications" runat="server" NavigateUrl="~/Notifications.aspx" CssClass="nav-link notification-link">
+                                    Notifications
+                                    <asp:Label ID="lblNotificationCount" runat="server" CssClass="notification-badge"></asp:Label>
+                                </asp:HyperLink>
+                            </li>
+                            <li class="nav-item">
+                                <asp:LinkButton ID="LinkButton1" runat="server" OnClick="lnkLogout_Click" Text="Logout" CssClass="nav-link" />
+                            </li>
+                        </asp:PlaceHolder>
+
+                        <!-- Admin Navigation -->
+                        <asp:PlaceHolder ID="AdminUserNav" runat="server" Visible="false">
+                            <li class="nav-item">
+                                <a class="nav-link" href="AdminDashboard.aspx">Dashboard</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="ManageGuidelines.aspx">Guideline Edit</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link admin-moderation" href="ManageModeration.aspx">Moderation</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link admin-permissions" href="ManagePermissions.aspx">Permissions</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link admin-analytics" href="ViewAnalytics.aspx">Analytics</a>
+                            </li>
+                            <!--
+                            <li class="nav-item">
+                                <asp:Label ID="lblAdminBadge" runat="server" 
+                                    Text="ADMIN" 
+                                    CssClass="admin-badge">
+                                </asp:Label>
+                            </li>
+                            -->
+                            <li class="nav-item">
+                                <asp:LinkButton ID="lnkAdminLogout" runat="server" OnClick="lnkAdminLogout_Click" Text="Logout" CssClass="nav-link admin-logout" />
+                            </li>
+                        </asp:PlaceHolder>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <main>
+            <asp:ContentPlaceHolder ID="MainContent" runat="server">
+            </asp:ContentPlaceHolder>
+        </main>
+
+        <footer class="chordal-footer">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5 class="footer-brand">Chordal</h5>
+                        <p class="footer-tagline">Harmony rethought</p>
+                       
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <div class="footer-links">
+                            <a href="~/LandingPage.aspx" class="footer-link">Home</a>
+                            <a href="#" class="footer-link">About</a>
+                            <a href="#" class="footer-link">Contact</a>
+                            <a href="#" class="footer-link">Privacy</a>
+                         </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </form>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,445 @@
+﻿/* ==========================================
+   SHARE PROGRESSION - MINIMALIST DESIGN
+   ========================================== */
+
+/* Share Header with Wave Canvas */
+.share-header-section {
+    position: relative;
+    background: linear-gradient(135deg, var(--color-teal) 0%, var(--color-teal-medium) 100%);
+    padding: var(--spacing-2xl) 0;
+    padding-bottom: 0px;
+    margin-bottom: var(--spacing-2xl);
+    overflow: hidden;
+    min-height: 250px;
+}
+
+#share-wave-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.2;
+    z-index: 1;
+}
+
+.share-header-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.share-header-title {
+    font-family: var(--font-heading);
+    font-size: var(--text-5xl);
+    font-weight: 700;
+    color: var(--color-white);
+    margin-bottom: var(--spacing-md);
+    line-height: 1.2;
+}
+
+.share-header-subtitle {
+    font-size: var(--text-xl);
+    color: rgba(255, 255, 255, 0.95);
+    line-height: 1.6;
+    font-weight: 400;
+}
+
+/* ==========================================
+   SHARE CONTAINER
+   ========================================== */
+.share-container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* ==========================================
+   STATUS MESSAGES
+   ========================================== */
+.alert-modern {
+    padding: var(--spacing-md) var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+    border-radius: var(--radius-md);
+    border: var(--border-width) solid;
+    font-size: var(--text-base);
+}
+
+.alert-success {
+    background: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+.alert-error {
+    background: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+
+.alert-warning {
+    background: #fff3cd;
+    border-color: #ffeeba;
+    color: #856404;
+}
+
+/* ==========================================
+   PROGRESSION PREVIEW
+   ========================================== */
+.progression-preview {
+    background: var(--color-soft-green);
+    border: var(--border-width) solid var(--color-teal-light);
+    border-left: 4px solid var(--color-teal);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+}
+
+    .progression-preview h3 {
+        font-family: var(--font-heading);
+        font-size: var(--text-2xl);
+        color: var(--color-text-primary);
+        margin: 0 0 var(--spacing-md) 0;
+    }
+
+.preview-detail {
+    margin: var(--spacing-xs) 0;
+    color: var(--color-text-secondary);
+    font-size: var(--text-base);
+}
+
+    .preview-detail strong {
+        color: var(--color-text-primary);
+        font-weight: 600;
+        margin-right: var(--spacing-xs);
+    }
+
+/* ==========================================
+   FORM SECTIONS
+   ========================================== */
+.form-section {
+    background: var(--color-white);
+    border: var(--border-width) solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    margin-bottom: var(--spacing-xl);
+}
+
+    .form-section h3 {
+        font-family: var(--font-heading);
+        font-size: var(--text-2xl);
+        color: var(--color-text-primary);
+        border-bottom: var(--border-width-thick) solid var(--color-teal);
+        padding-bottom: var(--spacing-md);
+        margin-bottom: var(--spacing-lg);
+    }
+
+/* ==========================================
+   FORM GROUPS
+   ========================================== */
+.form-group {
+    margin-bottom: var(--spacing-lg);
+}
+
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        color: var(--color-text-primary);
+        margin-bottom: var(--spacing-sm);
+        font-size: var(--text-base);
+    }
+
+.char-counter {
+    float: right;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    font-weight: 400;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: var(--border-width) solid var(--border-color);
+    border-radius: var(--radius-md);
+    font-size: var(--text-base);
+    font-family: var(--font-body);
+    color: var(--color-text-secondary);
+    transition: all var(--transition-base);
+    background: var(--color-white);
+}
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--color-teal);
+        box-shadow: 0 0 0 3px rgba(23, 115, 100, 0.1);
+    }
+
+    .form-control::placeholder {
+        color: var(--color-text-light);
+    }
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 120px;
+    line-height: 1.6;
+}
+
+.info-text {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    margin-top: var(--spacing-xs);
+    line-height: 1.5;
+}
+
+.text-danger {
+    color: var(--color-accent-pink);
+    font-size: var(--text-sm);
+    margin-top: var(--spacing-xs);
+    display: block;
+}
+
+/* ==========================================
+   PERMISSION OPTIONS
+   ========================================== */
+.permission-options {
+    background: var(--color-light-gray);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+}
+
+.permission-option {
+    margin: var(--spacing-md) 0;
+    padding: var(--spacing-md);
+    border: var(--border-width) solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--color-white);
+    transition: all var(--transition-base);
+    cursor: pointer;
+}
+
+    .permission-option:hover {
+        border-color: var(--color-teal);
+        background: var(--color-soft-green);
+    }
+
+    .permission-option input[type="radio"] {
+        margin-right: var(--spacing-sm);
+        cursor: pointer;
+    }
+
+    .permission-option strong {
+        color: var(--color-text-primary);
+        font-size: var(--text-base);
+        display: block;
+        margin-bottom: var(--spacing-xs);
+    }
+
+    .permission-option .info-text {
+        margin-top: var(--spacing-xs);
+        padding-left: calc(1rem + var(--spacing-sm));
+    }
+
+/* ==========================================
+   CHECKBOX OPTIONS
+   ========================================== */
+.checkbox-option {
+    margin: var(--spacing-lg) 0;
+    padding: var(--spacing-md);
+    background: var(--color-soft-green);
+    border: var(--border-width) solid var(--color-teal-light);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-base);
+}
+
+    .checkbox-option:hover {
+        background: var(--color-light-gray);
+    }
+
+    .checkbox-option input[type="checkbox"] {
+        margin-right: var(--spacing-sm);
+        cursor: pointer;
+    }
+
+    .checkbox-option strong {
+        color: var(--color-text-primary);
+        font-size: var(--text-base);
+    }
+
+    .checkbox-option .info-text {
+        margin-top: var(--spacing-xs);
+        padding-left: calc(1rem + var(--spacing-sm));
+    }
+
+/* ==========================================
+   BUTTON GROUP
+   ========================================== */
+.btn-group-share {
+    display: flex;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-xl);
+    padding-top: var(--spacing-xl);
+    border-top: var(--border-width) solid var(--border-color);
+}
+
+.btn-share-primary {
+    flex: 1;
+    padding: 1rem 2rem;
+    background: var(--color-teal);
+    color: var(--color-white);
+    border: none;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: var(--text-base);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+}
+
+    .btn-share-primary:hover {
+        background: var(--color-teal-medium);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(23, 115, 100, 0.3);
+    }
+
+.btn-share-secondary {
+    flex: 1;
+    padding: 1rem 2rem;
+    background: var(--color-white);
+    color: var(--color-text-secondary);
+    border: var(--border-width-thick) solid var(--border-color);
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: var(--text-base);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+}
+
+    .btn-share-secondary:hover {
+        background: var(--color-light-gray);
+        border-color: var(--color-text-muted);
+        transform: translateY(-1px);
+    }
+
+/* ==========================================
+   TAG INPUT ENHANCEMENTS
+   ========================================== */
+.tag-input-container {
+    position: relative;
+}
+
+.tag-suggestions {
+    list-style: none;
+    padding: 0;
+    margin: var(--spacing-xs) 0 0 0;
+    background: var(--color-white);
+    border: var(--border-width) solid var(--border-color);
+    border-radius: var(--radius-md);
+    max-height: 200px;
+    overflow-y: auto;
+    box-shadow: var(--shadow-sm);
+    position: absolute;
+    width: 100%;
+    z-index: 10;
+}
+
+    .tag-suggestions li {
+        padding: var(--spacing-sm) var(--spacing-md);
+        cursor: pointer;
+        transition: all var(--transition-fast);
+        color: var(--color-text-secondary);
+    }
+
+        .tag-suggestions li:hover {
+            background: var(--color-soft-green);
+            color: var(--color-teal);
+        }
+
+/* ==========================================
+   RESPONSIVE DESIGN
+   ========================================== */
+@media (max-width: 768px) {
+    .share-header-section {
+        min-height: 200px;
+    }
+
+    .share-header-title {
+        font-size: var(--text-3xl);
+    }
+
+    .share-header-subtitle {
+        font-size: var(--text-lg);
+    }
+
+    .share-container {
+        padding: 0 var(--spacing-md);
+    }
+
+    .form-section {
+        padding: var(--spacing-md);
+    }
+
+    .btn-group-share {
+        flex-direction: column;
+    }
+
+    .char-counter {
+        float: none;
+        display: block;
+        margin-top: var(--spacing-xs);
+    }
+}
+
+@media (max-width: 576px) {
+    .share-header-section {
+        min-height: 180px;
+        padding: var(--spacing-lg) 0;
+    }
+
+    .share-header-title {
+        font-size: var(--text-2xl);
+    }
+
+    .progression-preview {
+        padding: var(--spacing-md);
+    }
+
+    .form-section h3 {
+        font-size: var(--text-xl);
+    }
+}
+
+/* ==========================================
+   ANIMATIONS
+   ========================================== */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.form-section,
+.progression-preview {
+    animation: slideInUp 0.5s ease;
+}
+
+    .form-section:nth-child(2) {
+        animation-delay: 0.1s;
+    }
+
+    .form-section:nth-child(3) {
+        animation-delay: 0.2s;
+    }

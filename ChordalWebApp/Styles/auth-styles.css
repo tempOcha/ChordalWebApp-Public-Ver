@@ -1,0 +1,482 @@
+﻿/* ==========================================
+   CHORDAL AUTHENTICATION PAGES
+   Wave-Based Design with Animated Border
+   ========================================== */
+
+/* ==========================================
+   AUTH CONTAINER LAYOUT
+   ========================================== */
+.auth-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-white);
+    position: relative;
+    overflow: hidden;
+    padding: 2rem 1rem;
+}
+
+.auth-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    max-width: 1200px;
+    width: 100%;
+    min-height: 600px;
+    background: var(--color-white);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    position: relative;
+    z-index: 10;
+}
+
+/* ==========================================
+   LEFT PANEL - IMAGE SIDE WITH WAVE CANVAS
+   ========================================== */
+.auth-visual-panel {
+    position: relative;
+    background: linear-gradient(135deg, var(--color-teal) 0%, var(--color-teal-medium) 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: var(--spacing-xl);
+    overflow: hidden;
+}
+
+.auth-visual-content {
+    position: relative;
+    z-index: 2;
+}
+
+.auth-logo {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-2xl);
+}
+
+.auth-logo-icon {
+    width: 48px;
+    height: 48px;
+    background: var(--color-white);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: var(--color-teal);
+    font-size: 1.5rem;
+    font-family: var(--font-heading);
+}
+
+.auth-logo-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.auth-brand {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-white);
+    margin: 0;
+    line-height: 1;
+}
+
+.auth-tagline {
+    font-size: var(--text-sm);
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 400;
+    margin: 0;
+    margin-top: 4px;
+}
+
+.auth-visual-text {
+    margin-top: auto;
+}
+
+.auth-visual-title {
+    font-family: var(--font-heading);
+    font-size: var(--text-4xl);
+    font-weight: 700;
+    color: var(--color-white);
+    margin-bottom: var(--spacing-md);
+    line-height: 1.2;
+}
+
+.auth-visual-subtitle {
+    font-size: var(--text-base);
+    color: rgba(255, 255, 255, 0.95);
+    line-height: 1.6;
+    max-width: 400px;
+}
+
+/* Wave Canvas Container */
+#auth-wave-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    opacity: 0.15;
+}
+
+/* ==========================================
+   RIGHT PANEL - FORM SIDE
+   ========================================== */
+.auth-form-panel {
+    background: var(--color-white);
+    padding: var(--spacing-2xl);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.auth-form-header {
+    margin-bottom: var(--spacing-xl);
+}
+
+.auth-form-title {
+    font-family: var(--font-heading);
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.auth-form-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-muted);
+    margin: 0;
+}
+
+/* ==========================================
+   FORM ELEMENTS
+   ========================================== */
+.auth-form-group {
+    margin-bottom: var(--spacing-lg);
+}
+
+.auth-form-label {
+    display: block;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    margin-bottom: var(--spacing-xs);
+    font-size: var(--text-sm);
+}
+
+.auth-input-wrapper {
+    position: relative;
+}
+
+.auth-form-input {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border: var(--border-width-thick) solid var(--border-color);
+    border-radius: var(--radius-md);
+    font-size: var(--text-base);
+    font-family: var(--font-body);
+    color: var(--color-text-secondary);
+    transition: all var(--transition-base);
+    background: var(--color-white);
+}
+
+    .auth-form-input:focus {
+        outline: none;
+        border-color: var(--color-teal);
+        box-shadow: 0 0 0 3px rgba(23, 115, 100, 0.1);
+    }
+
+    .auth-form-input::placeholder {
+        color: var(--color-text-light);
+    }
+
+/* Password Toggle Icon */
+.password-toggle {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: var(--color-text-muted);
+    transition: color var(--transition-base);
+}
+
+    .password-toggle:hover {
+        color: var(--color-teal);
+    }
+
+/* ==========================================
+   FORM HELPERS
+   ========================================== */
+.auth-form-helper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: var(--spacing-sm);
+    margin-bottom: var(--spacing-lg);
+}
+
+.auth-remember {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+    .auth-remember input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+        accent-color: var(--color-teal);
+    }
+
+    .auth-remember label {
+        font-size: var(--text-sm);
+        color: var(--color-text-secondary);
+        cursor: pointer;
+        margin: 0;
+    }
+
+.auth-forgot-link {
+    font-size: var(--text-sm);
+    color: var(--color-teal);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color var(--transition-base);
+}
+
+    .auth-forgot-link:hover {
+        color: var(--color-teal-medium);
+    }
+
+/* ==========================================
+   SUBMIT BUTTON
+   ========================================== */
+.auth-submit-btn {
+    width: 100%;
+    padding: 1rem 2rem;
+    background: var(--color-teal);
+    color: var(--color-white);
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: var(--text-base);
+    font-weight: 600;
+    font-family: var(--font-body);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    margin-bottom: var(--spacing-md);
+}
+
+    .auth-submit-btn:hover {
+        background: var(--color-teal-medium);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(23, 115, 100, 0.3);
+    }
+
+    .auth-submit-btn:active {
+        transform: translateY(0);
+    }
+
+    .auth-submit-btn:disabled {
+        background: var(--color-text-muted);
+        cursor: not-allowed;
+        transform: none;
+    }
+
+/* ==========================================
+   DIVIDER
+   ========================================== */
+.auth-divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: var(--spacing-lg) 0;
+}
+
+    .auth-divider::before,
+    .auth-divider::after {
+        content: '';
+        flex: 1;
+        border-bottom: var(--border-width) solid var(--border-color);
+    }
+
+    .auth-divider span {
+        padding: 0 var(--spacing-md);
+        color: var(--color-text-muted);
+        font-size: var(--text-sm);
+    }
+
+/* ==========================================
+   FOOTER LINKS
+   ========================================== */
+.auth-footer {
+    text-align: center;
+    margin-top: var(--spacing-lg);
+    padding-top: var(--spacing-lg);
+    border-top: var(--border-width) solid var(--border-color);
+}
+
+.auth-footer-text {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    margin: 0;
+}
+
+.auth-footer-link {
+    color: var(--color-teal);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color var(--transition-base);
+}
+
+    .auth-footer-link:hover {
+        color: var(--color-teal-medium);
+    }
+
+/* ==========================================
+   VALIDATION MESSAGES
+   ========================================== */
+.auth-validation {
+    display: block;
+    color: var(--color-accent-pink);
+    font-size: var(--text-sm);
+    margin-top: var(--spacing-xs);
+}
+
+.auth-status-message {
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-lg);
+    font-size: var(--text-sm);
+}
+
+.auth-status-error {
+    background: #fff5f5;
+    border: var(--border-width) solid var(--color-accent-pink);
+    color: #c53030;
+}
+
+.auth-status-success {
+    background: #f0fdf4;
+    border: var(--border-width) solid var(--color-teal);
+    color: #166534;
+}
+
+/* ==========================================
+   PASSWORD REQUIREMENTS
+   ========================================== */
+.auth-requirements {
+    background: var(--color-soft-green);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    border-left: 3px solid var(--color-teal);
+    margin-top: var(--spacing-md);
+}
+
+.auth-requirements-title {
+    font-weight: 600;
+    color: var(--color-text-primary);
+    font-size: var(--text-sm);
+    margin-bottom: var(--spacing-xs);
+}
+
+.auth-requirements-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+    .auth-requirements-list li {
+        font-size: var(--text-sm);
+        color: var(--color-text-muted);
+        padding: 4px 0;
+        padding-left: 1.25rem;
+        position: relative;
+    }
+
+        .auth-requirements-list li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--color-teal);
+            font-weight: bold;
+        }
+
+/* ==========================================
+   SUCCESS WAVE TRANSITION
+   ========================================== */
+#auth-success-wave {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+    #auth-success-wave.active {
+        opacity: 1;
+    }
+
+/* ==========================================
+   RESPONSIVE DESIGN
+   ========================================== */
+@media (max-width: 992px) {
+    .auth-container {
+        grid-template-columns: 1fr;
+        max-width: 500px;
+    }
+
+    .auth-visual-panel {
+        display: none;
+    }
+
+    .auth-form-panel {
+        padding: var(--spacing-xl);
+    }
+}
+
+@media (max-width: 576px) {
+    .auth-page {
+        padding: 1rem;
+    }
+
+    .auth-form-panel {
+        padding: var(--spacing-lg);
+    }
+
+    .auth-form-title {
+        font-size: var(--text-2xl);
+    }
+
+    .auth-visual-title {
+        font-size: var(--text-3xl);
+    }
+}
+
+/* ==========================================
+   ADMIN LOGIN VARIANT
+   ========================================== */
+.auth-visual-panel.admin {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+}
+
+.auth-logo-icon.admin {
+    color: #dc3545;
+}
+
+.admin-badge-header {
+    display: inline-block;
+    background: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    margin-bottom: var(--spacing-md);
+}
